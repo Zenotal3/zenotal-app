@@ -1,0 +1,712 @@
+/* Full page background */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+}
+
+/* Audio Interface Styles */
+.audio-container {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    opacity: 1;
+}
+
+/* Only animate on initial load, not on blackout toggle */
+.audio-container.initial-load {
+    opacity: 0;
+    animation: fadeInFromBlack 1s ease-in-out forwards;
+}
+
+@keyframes fadeInFromBlack {
+    0% {
+        opacity: 0;
+        background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    }
+    50% {
+        opacity: 0.5;
+        background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    }
+    100% {
+        opacity: 1;
+        background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    }
+}
+
+/* Logo */
+.logo {
+    margin: 3rem 0 0 0;
+    opacity: 0.9;
+    flex-shrink: 0;
+}
+
+.logo svg {
+    width: 200px;
+    height: auto;
+}
+
+.logo svg path {
+    fill: white;
+}
+
+/* Countdown Timer - Center of screen */
+.countdown-timer {
+    position: fixed;
+    font-size: 5rem;
+    font-weight: 300;
+    letter-spacing: -4px;
+    text-align: center;
+    color: white;
+    margin: 2rem 0;
+    top: 40%;              /* Vertical position */
+    left: 50%;             /* Horizontal position */
+    transform: translate(-50%, -50%); /* Center it on those coordinates */
+    /* Remove flex: 1 */
+}
+
+/* Loading Video Animation */
+.loading-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    opacity: 0.9;
+    z-index: 10;
+    display: block;
+    object-fit: contain;
+    background: transparent !important;
+    border: none;
+    outline: none;
+    filter: contrast(1.2) brightness(1.1);
+    mix-blend-mode: multiply;
+    animation: fadeInVideoOnly 1s ease-in-out forwards;
+}
+
+/* Enhanced mobile/tablet video transparency and performance */
+@media (max-width: 768px) {
+    .loading-video {
+        mix-blend-mode: screen;
+        filter: contrast(1.4) brightness(1.15) saturate(1.1);
+        background: transparent !important;
+        /* Improved mobile transparency and performance */
+        -webkit-background-composite: transparent;
+        -webkit-transform: translate3d(-50%, -50%, 0);
+        transform: translate3d(-50%, -50%, 0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        -webkit-perspective: 1000px;
+        perspective: 1000px;
+        /* Ensure proper video sizing on mobile */
+        object-fit: cover;
+        /* Prevent video from being cut off on smaller screens */
+        max-width: min(200px, 40vw);
+        max-height: min(200px, 40vw);
+    }
+    
+    /* Improved fallback spinner for mobile */
+    .loading-fallback {
+        width: min(80px, 20vw);
+        height: min(80px, 20vw);
+        margin: calc(-1 * min(40px, 10vw)) 0 0 calc(-1 * min(40px, 10vw));
+        border-width: 3px;
+    }
+}
+
+/* Video element - JavaScript will control visibility for canvas source */
+#loadingVideo {
+    /* Position for canvas source usage */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Canvas with black removal filter */
+#loadingCanvas {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    opacity: 0.9;
+    z-index: 10;
+    background: transparent !important;
+    filter: contrast(1.5) brightness(1.2);
+    mix-blend-mode: screen;
+    animation: fadeInVideoOnly 1s ease-in-out forwards;
+}
+
+@keyframes fadeInVideoOnly {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0.9;
+    }
+}
+
+/* Fallback for browsers that don't support WebM/MP4 */
+.loading-fallback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 80px;
+    height: 80px;
+    margin: -40px 0 0 -40px;
+    border: 4px solid rgba(255, 255, 255, 0.2);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1.2s linear infinite;
+    z-index: 10;
+    opacity: 0.9;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Hide text when video is playing */
+.countdown-timer.loading #currentTime {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* Show text when video is hidden */
+.countdown-timer #currentTime {
+    transition: opacity 0.3s ease;
+}
+
+/* Ensure loading video works in blackout mode */
+.audio-container.blackout .loading-video {
+    opacity: 0.9 !important;
+    display: block !important;
+}
+
+.audio-container.blackout .loading-fallback {
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid white;
+}
+
+/* Control Bar - Bottom of screen */
+.control-bar {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 337px;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem 2rem;
+    background: rgba(68, 68, 68, 0.6);
+    border-radius: 50px;
+    gap: 1.5rem;
+}
+
+/* Control Buttons */
+.control-btn {
+    background: transparent !important;
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #333;
+    box-shadow: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.control-btn:hover {
+    background: transparent !important;
+    transform: scale(1.05);
+    box-shadow: none;
+}
+
+/* Play/Pause button (center) - larger */
+.control-btn.play-pause {
+    width: 74px;
+    height: 74px;
+    background: white !important;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.control-btn.play-pause:hover {
+    background: #f5f5f5 !important;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.control-btn.play-pause svg {
+    width: 74px;
+    height: 74px;
+    fill: none;
+}
+
+.control-btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #333;
+}
+
+/* Subtitle button - special styling for toggle switch */
+.control-btn.subtitles {
+    border-radius: 20px;
+    width: 70px;
+    height: 45px;
+    background: transparent !important;
+    border: none;
+    box-shadow: none;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.control-btn.subtitles .subtitles-off {
+    display: block;
+}
+
+.control-btn.subtitles .subtitles-on {
+    display: none;
+}
+
+.control-btn.subtitles.active .subtitles-off {
+    display: none !important;
+}
+
+.control-btn.subtitles.active .subtitles-on {
+    display: block !important;
+}
+
+.control-btn.subtitles svg {
+    width: 57px;
+    height: 35px;
+    fill: none;
+}
+
+.control-btn.subtitles:hover {
+    background: transparent !important;
+    box-shadow: none;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Active state - no background changes needed since handled by SVG swap */
+.control-btn.subtitles.active {
+    background: transparent !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Sleep/Blackout button - toggle between moon icons */
+.control-btn.blackout {
+    background: transparent !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.control-btn.blackout:hover {
+    background: transparent !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.control-btn.blackout .sleep-off {
+    display: block;
+}
+
+.control-btn.blackout .sleep-on {
+    display: none;
+}
+
+.control-btn.blackout.active .sleep-off {
+    display: none !important;
+}
+
+.control-btn.blackout.active .sleep-on {
+    display: block !important;
+}
+
+.control-btn.blackout.active {
+    background: transparent !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.control-btn.blackout svg {
+    width: 35px;
+    height: 34px;
+}
+
+/* Since both SVGs are white, we control visibility through display */
+.control-btn.blackout svg path {
+    fill: white;
+}
+
+.control-btn.blackout.active svg path {
+    fill: white;
+}
+
+/* Hidden elements for new design */
+.audio-player {
+    display: none;
+}
+
+/* Session Info */
+.session-info {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.session-info h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.session-info p {
+    font-size: 1rem;
+    opacity: 0.8;
+}
+
+/* Progress Bar */
+.progress-container {
+    margin-bottom: 2rem;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #fff 0%, #f0f0f0 100%);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.time-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+/* Controls */
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+/* Subtitles Container */
+.subtitles-container {
+    position: fixed;
+    width: 90%;
+    max-width: 800px;
+    height: auto;
+    min-height: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 14rem;
+    background: transparent;
+    border-radius: 0;
+    padding: 0.8rem 1rem;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-sizing: border-box;
+}
+
+.subtitles-container.visible {
+    opacity: 1;
+}
+
+.subtitles-container p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+
+/* Blackout Mode */
+.audio-container.blackout {
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.25) 30%, #000 70%) !important;
+    opacity: 1 !important;
+    animation: none !important;
+    transition: background 0s !important;
+}
+
+/* Override html/body background in blackout mode to pure black */
+body:has(.audio-container.blackout),
+html:has(.audio-container.blackout) {
+    background: #000 !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+body.blackout-mode-active,
+html.blackout-mode-active,
+.blackout-mode-active {
+    background: #000 !important;
+}
+
+.blackout-mode-active html,
+.blackout-mode-active body {
+    background: #000 !important;
+}
+
+.audio-container.blackout .logo {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+.audio-container.blackout .logo svg path {
+    fill: white !important;
+}
+
+.audio-container.blackout .countdown-timer {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    color: white !important;
+}
+
+.audio-container.blackout .countdown-timer #currentTime {
+    color: white !important;
+}
+
+/* Keep control bar visible in blackout mode */
+.audio-container.blackout .control-bar {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* Keep all control buttons visible and functional in blackout mode */
+.audio-container.blackout .control-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+}
+
+/* Maintain blackout button styling in blackout mode */
+.audio-container.blackout .control-btn.blackout {
+    background: transparent !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+.audio-container.blackout .control-btn.blackout svg path {
+    fill: white !important;
+}
+
+/* Ensure subtitles button stays visible in blackout mode */
+.audio-container.blackout .control-btn.subtitles {
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Subtitles behavior in blackout mode - show if user has them enabled */
+.audio-container.blackout .subtitles-container {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.audio-container.blackout .subtitles-container.visible {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    background: transparent;
+    color: white;
+}
+
+/* Loading State */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading .control-btn {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+/* Responsive Design */
+/* Tablets (475px-768px) */
+@media (min-width: 475px) and (max-width: 767px) {
+    .audio-container {
+        padding: 0;
+    }
+    
+    .logo {
+        margin: 1.5rem 0;
+    }
+    
+    .logo svg {
+        width: 150px;
+    }
+    
+    .audio-player {
+        padding: 1.5rem;
+        margin: 0 1rem 2rem 1rem;
+    }
+    
+    .session-info h2 {
+        font-size: 1.3rem;
+    }
+    
+    .controls {
+        gap: 1rem;
+    }
+    
+    .control-btn {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .control-btn.play-pause {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .control-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .control-btn.play-pause svg {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .control-btn.blackout svg {
+        width: 29px;
+        height: 28px;
+    }
+    
+    .subtitles-container {
+        padding: 1rem;
+        min-height: 60px;
+    }
+    
+    .subtitles-container {
+        width: 95%;
+        bottom: 10rem;
+        padding: 0.8rem 0.5rem;
+        min-height: 40px;
+    }
+    
+    .subtitles-container p {
+        font-size: 1rem;
+        line-height: 1.4;
+    }
+}
+
+/* Mobile (<475px) */
+
+@media (max-width: 474px) {
+    .logo {
+        margin: 1rem 0;
+    }
+    
+    .logo svg {
+        width: 120px;
+    }
+    
+    .audio-player {
+        padding: 1rem;
+        margin: 0 0.5rem 1.5rem 0.5rem;
+    }
+    
+    .session-info h2 {
+        font-size: 1.2rem;
+    }
+    
+    .session-info p {
+        font-size: 0.9rem;
+    }
+    
+    .controls {
+        gap: 0.8rem;
+    }
+    
+    .control-btn {
+        width: 55px;
+        height: 55px;
+    }
+    
+    .control-btn.play-pause {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .control-btn.blackout svg {
+        width: 32px;
+        height: 31px;
+    }
+    
+    .subtitles-container {
+        width: 98%;
+        bottom: 9rem;
+        padding: 0.8rem 0.5rem;
+        min-height: 50px;
+    }
+    
+    .subtitles-container p {
+        font-size: 0.9rem;
+        line-height: 1.3;
+    }
+    
+    /* Mobile loading animation adjustments */
+    .loading-fallback {
+        width: 100px;
+        height: 100px;
+        margin: -50px 0 0 -50px;
+        border-width: 5px;
+    }
+    
+    /* Ensure loading animations work on mobile */
+    .loading-video,
+    #loadingCanvas {
+        width: 150px;
+        height: 150px;
+    }
+}

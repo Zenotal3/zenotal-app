@@ -1,0 +1,886 @@
+/* Import Outfit font */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;700&display=swap');
+
+/* Base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Outfit', sans-serif;
+    background-color: #ffffff;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Conversation container */
+.conversation-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Logo positioning */
+.logo {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Character name - positioned above top left of speech bubble */
+.character-name {
+    position: absolute;
+    width: auto;
+    height: 30px;
+    left: 50%;
+    top: 51%;
+    transform: translate(-223px, -80px); /* Position above top left of bubble - closer */
+    
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 30px;
+    color: #000000;
+}
+
+/* Speech bubble - following Rectangle 6 design */
+.speech-bubble {
+    position: absolute;
+    width: 446px;
+    height: 70px;
+    left: 50%;
+    top: 51%;
+    transform: translate(-50%, -45px);
+    
+    background: #FFC3AF;
+    border-radius: 0px 100px 100px 50px;
+    
+    /* Center the text inside */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 36px;
+}
+
+/* Speech text styling */
+.speech-text {
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 30px;
+    color: #000000;
+}
+
+/* Button container - positioned below speech bubble */
+.button-container {
+    position: absolute;
+    left: 50%;
+    top: 51%;
+    transform: translate(-50%, 110px); /* Increased space from speech bubble */
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Yes button - in container */
+.yes-btn {
+    position: relative;
+    width: 132.71px;
+    height: 51.84px;
+    
+    /* Auto layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 17px 6px;
+    gap: 10px;
+    
+    background: #000000;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    
+    /* Text styling */
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 30px;
+    color: #FFFFFF;
+}
+
+/* Skip button - in container */
+.skip-btn {
+    position: relative;
+    width: 132.71px;
+    height: 51.84px;
+    
+    /* Auto layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 17px 6px;
+    gap: 10px;
+    
+    background: transparent;
+    border: 3px solid #000000;
+    border-radius: 30px;
+    cursor: pointer;
+    
+    /* Text styling */
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 30px;
+    color: #000000;
+}
+
+/* Button hover effects */
+.yes-btn:hover {
+    background: #333333;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.skip-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+/* Button active states */
+.yes-btn:active {
+    transform: translateY(0);
+}
+
+.skip-btn:active {
+    transform: translateY(0);
+}
+
+/* Loading states */
+.yes-btn.loading,
+.skip-btn.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Focus states for accessibility */
+.yes-btn:focus,
+.skip-btn:focus {
+    outline: 2px solid #4A90E2;
+    outline-offset: 2px;
+}
+
+/* Character Selection Buttons */
+.character-selection {
+    position: absolute;
+    left: 50%;
+    top: calc(51% + 30px); /* Further reduced spacing from 50px to 30px */
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.character-btn {
+    width: 140px;
+    height: 55px;
+    background: #000000;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    font-family: 'Outfit';
+    font-style: normal;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 30px;
+    color: #FFFFFF;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.character-btn:hover {
+    background: #333333;
+    transform: translateY(-3px);
+}
+
+.character-btn:active {
+    transform: translateY(0);
+}
+
+/* Conversation Buttons (same positioning as character buttons) */
+.conversation-buttons {
+    position: absolute;
+    left: 50%;
+    top: calc(51% + 30px); /* Further reduced spacing from 50px to 30px */
+    transform: translateX(-50%);
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+/* ============================================
+   TIER 1: COMMON BREAKPOINT RANGES (FALLBACK)
+   ============================================ */
+
+/* Extra Small Mobile (Portrait): 320px – 480px */
+@media (min-width: 320px) and (max-width: 480px) {
+    .character-name {
+        left: 50%;
+        top: 25vh;
+        transform: translate(-150px, -40px); /* Closer to bubble */
+        font-size: 18px;
+        line-height: 24px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 25vh;
+        width: 85%;
+        height: auto;
+        min-height: 60px;
+        padding-left: 20px;
+    }
+    
+    .speech-text {
+        font-size: 20px;
+        line-height: 26px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 25vh;
+        transform: translate(-50%, 120px); /* Increased space from bubble */
+        gap: 10px; /* Smaller gap for mobile */
+        flex-direction: row; /* Ensure side by side */
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(25vh + 70px); /* Further reduced spacing from 90px to 70px */
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 100px; /* Smaller buttons for mobile */
+        height: 44px;
+        font-size: 16px; /* Smaller text */
+        line-height: 22px;
+    }
+    
+    .character-btn {
+        width: 110px;
+        height: 44px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+}
+
+/* Small Mobile (Landscape): 481px – 600px */
+@media (min-width: 481px) and (max-width: 600px) {
+    .character-name {
+        left: 50%;
+        top: 28vh;
+        transform: translate(-160px, -40px); /* Closer to bubble */
+        font-size: 20px;
+        line-height: 26px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 28vh;
+        width: 80%;
+        height: auto;
+        min-height: 65px;
+        padding-left: 25px;
+    }
+    
+    .speech-text {
+        font-size: 22px;
+        line-height: 28px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 28vh;
+        transform: translate(-50%, 125px); /* Increased space from bubble */
+        gap: 12px;
+        flex-direction: row; /* Ensure side by side */
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(28vh + 80px); /* Further reduced spacing from 100px to 80px */
+        flex-direction: column;
+        gap: 14px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 110px;
+        height: 46px;
+        font-size: 18px;
+        line-height: 24px;
+    }
+    
+    .character-btn {
+        width: 115px;
+        height: 46px;
+        font-size: 20px;
+        line-height: 26px;
+    }
+}
+
+/* Small Tablets (Portrait): 601px – 768px */
+@media (min-width: 601px) and (max-width: 768px) {
+    .character-name {
+        left: 50%;
+        top: 30vh;
+        transform: translate(-187px, -40px); /* Closer to bubble */
+        font-size: 22px;
+        line-height: 28px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        transform: translateX(-50%);
+        top: 30vh;
+        width: 75%;
+        height: auto;
+        min-height: 68px;
+        padding-left: 30px;
+    }
+    
+    .speech-text {
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 30vh;
+        transform: translate(-50%, 130px); /* Increased space from bubble */
+        gap: 16px;
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(30vh + 90px); /* Further reduced spacing from 110px to 90px */
+        gap: 16px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 120px;
+        height: 48px;
+        font-size: 22px;
+        line-height: 28px;
+    }
+    
+    .character-btn {
+        width: 120px;
+        height: 48px;
+        font-size: 22px;
+        line-height: 28px;
+    }
+}
+
+/* Large Tablets (Landscape): 769px – 1024px */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .character-name {
+        left: 50%;
+        top: 48%;
+        transform: translate(-200px, -75px); /* Closer to bubble */
+        font-size: 23px;
+        line-height: 29px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 48%;
+        transform: translate(-50%, -35px);
+        width: 400px;
+        height: 68px;
+        padding-left: 32px;
+    }
+    
+    .speech-text {
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 48%;
+        transform: translate(-50%, 100px); /* Increased space from bubble */
+        gap: 18px;
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(48% + 50px); /* Further reduced spacing from 70px to 50px */
+        gap: 18px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 125px;
+        height: 50px;
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .character-btn {
+        width: 125px;
+        height: 50px;
+        font-size: 23px;
+        line-height: 29px;
+    }
+}
+
+/* Small Desktops and Laptops: 1025px – 1280px */
+@media (min-width: 1025px) and (max-width: 1280px) {
+    .character-name {
+        left: 50%;
+        top: 50%;
+        transform: translate(-210px, -75px); /* Closer to bubble */
+        font-size: 23px;
+        line-height: 29px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -40px);
+        width: 420px;
+        height: 68px;
+        padding-left: 34px;
+    }
+    
+    .speech-text {
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, 100px); /* Increased space from bubble */
+        gap: 19px;
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(50% + 50px); /* Further reduced spacing from 70px to 50px */
+        gap: 19px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 128px;
+        height: 50px;
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .character-btn {
+        width: 128px;
+        height: 50px;
+        font-size: 23px;
+        line-height: 29px;
+    }
+}
+
+/* Large Desktops: 1281px – 1440px */
+@media (min-width: 1281px) and (max-width: 1440px) {
+    .character-name {
+        left: 50%;
+        top: 50.5%;
+        transform: translate(-217px, -77px); /* Closer to bubble */
+        font-size: 24px;
+        line-height: 30px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 50.5%;
+        transform: translate(-50%, -42px);
+        width: 435px;
+        height: 69px;
+        padding-left: 35px;
+    }
+    
+    .speech-text {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 50.5%;
+        transform: translate(-50%, 105px); /* Increased space from bubble */
+        gap: 19px;
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(50.5% + 55px); /* Further reduced spacing from 75px to 55px */
+        gap: 19px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 130px;
+        height: 51px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .character-btn {
+        width: 130px;
+        height: 51px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+}
+
+/* Extra-Large Desktops: 1441px+ */
+@media (min-width: 1441px) {
+    .character-name {
+        left: 50%;
+        top: 51%;
+        transform: translate(-223px, -80px); /* Closer to bubble */
+        font-size: 24px;
+        line-height: 30px;
+        width: auto;
+        height: 30px;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 51%;
+        transform: translate(-50%, -45px);
+        width: 446px;
+        height: 70px;
+        padding-left: 36px;
+    }
+    
+    .speech-text {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 51%;
+        transform: translate(-50%, 110px); /* Increased space from bubble */
+        gap: 20px;
+    }
+    
+    .character-selection,
+    .conversation-buttons {
+        left: 50%;
+        transform: translateX(-50%);
+        top: calc(51% + 60px); /* Further reduced spacing from 80px to 60px */
+        gap: 20px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 132.71px;
+        height: 51.84px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .character-btn {
+        width: 140px;
+        height: 55px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+}
+
+/* ================================================
+   TIER 2: SPECIFIC POPULAR SIZES (PIXEL-PERFECT)
+   ================================================ */
+
+/* Common Android: 360×800 */
+@media (width: 360px) and (height: 800px) {
+    .character-name {
+        left: 50%;
+        top: 22vh;
+        transform: translate(-150px, -35px); /* Closer to bubble */
+        font-size: 17px;
+        line-height: 23px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 22vh;
+        transform: translateX(-50%);
+        width: 300px;
+        min-height: 55px;
+        padding-left: 18px;
+    }
+    
+    .speech-text {
+        font-size: 19px;
+        line-height: 25px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 22vh;
+        transform: translate(-50%, 110px); /* Increased space from bubble */
+        gap: 10px;
+        flex-direction: row; /* Ensure side by side */
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 95px; /* Smaller for tiny screens */
+        height: 42px;
+        font-size: 16px;
+        line-height: 22px;
+    }
+}
+
+/* iPhone 12/13/14: 390×844 */
+@media (width: 390px) and (height: 844px) {
+    .character-name {
+        left: 50%;
+        top: 24vh;
+        transform: translate(-165px, -38px); /* Closer to bubble */
+        font-size: 18px;
+        line-height: 24px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 24vh;
+        transform: translateX(-50%);
+        width: 330px;
+        min-height: 58px;
+        padding-left: 20px;
+    }
+    
+    .speech-text {
+        font-size: 20px;
+        line-height: 26px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 24vh;
+        transform: translate(-50%, 115px); /* Increased space from bubble */
+        gap: 12px;
+        flex-direction: row; /* Ensure side by side */
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 105px;
+        height: 43px;
+        font-size: 17px;
+        line-height: 23px;
+    }
+}
+
+/* iPhone 14 Pro: 393×873 */
+@media (width: 393px) and (height: 873px) {
+    .character-name {
+        left: 50%;
+        top: 24.5vh;
+        transform: translate(-167px, -39px); /* Closer to bubble */
+        font-size: 18px;
+        line-height: 24px;
+        width: auto;
+    }
+    
+    .speech-bubble {
+        left: 50%;
+        top: 24.5vh;
+        transform: translateX(-50%);
+        width: 335px;
+        min-height: 59px;
+        padding-left: 21px;
+    }
+    
+    .speech-text {
+        font-size: 20px;
+        line-height: 26px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 24.5vh;
+        transform: translate(-50%, 116px); /* Increased space from bubble */
+        gap: 12px;
+        flex-direction: row; /* Ensure side by side */
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 106px;
+        height: 44px;
+        font-size: 17px;
+        line-height: 23px;
+    }
+}
+
+/* Common Laptop: 1366×768 */
+@media (width: 1366px) and (height: 768px) {
+    .character-name {
+        left: 50%;
+        top: 50.2%;
+        transform: translate(-215px, -75px); /* Closer to bubble */
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .speech-bubble {
+        width: 430px;
+        height: 68px;
+        top: 50.2%;
+        transform: translate(-50%, -41px);
+        padding-left: 35px;
+    }
+    
+    .speech-text {
+        font-size: 23px;
+        line-height: 29px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 50.2%;
+        transform: translate(-50%, 100px); /* Increased space from bubble */
+        gap: 18px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 129px;
+        height: 50px;
+        font-size: 23px;
+        line-height: 29px;
+    }
+}
+
+/* Surface Devices: 1536×864 */
+@media (width: 1536px) and (height: 864px) {
+    .character-name {
+        left: 50%;
+        top: 50.8%;
+        transform: translate(-220px, -78px); /* Closer to bubble */
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .speech-bubble {
+        width: 440px;
+        height: 69px;
+        top: 50.8%;
+        transform: translate(-50%, -43px);
+        padding-left: 36px;
+    }
+    
+    .speech-text {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 50.8%;
+        transform: translate(-50%, 105px); /* Increased space from bubble */
+        gap: 19px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 131px;
+        height: 51px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+}
+
+/* Full HD Desktop: 1920×1080 */
+@media (width: 1920px) and (height: 1080px) {
+    .character-name {
+        left: 50%;
+        top: 51%;
+        transform: translate(-223px, -80px); /* Closer to bubble */
+        font-size: 24px;
+        line-height: 30px;
+        width: auto;
+        height: 30px;
+    }
+    
+    .speech-bubble {
+        width: 446px;
+        height: 70px;
+        left: 50%;
+        top: 51%;
+        transform: translate(-50%, -45px);
+        padding-left: 36px;
+    }
+    
+    .speech-text {
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .button-container {
+        left: 50%;
+        top: 51%;
+        transform: translate(-50%, 110px); /* Increased space from bubble */
+        gap: 20px;
+    }
+    
+    .yes-btn, .skip-btn {
+        width: 132.71px;
+        height: 51.84px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+    
+    .character-btn {
+        width: 140px;
+        height: 55px;
+        font-size: 24px;
+        line-height: 30px;
+    }
+}

@@ -1,0 +1,987 @@
+/* Emotion Wheel Page Styles */
+
+.emotion-wheel-container {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    background: #FFFFFF;
+    overflow: hidden;
+}
+
+/* Logo Styling */
+.logo {
+    position: absolute;
+    width: clamp(150px, 20vw, 233px);
+    height: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    top: clamp(20px, 4vh, 38px);
+    z-index: 5;
+}
+
+.logo svg {
+    width: 100%;
+    height: auto;
+}
+
+.prompt-text {
+    width: clamp(320px, 90vw, 800px); /* Increased width for better text flow */
+    height: auto;
+    opacity: 1;
+    position: absolute;
+    top: clamp(80px, 12vh, 140px); /* Reverted back to original position */
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: clamp(24px, 4vw, 40px);
+    line-height: clamp(30px, 5vw, 50px);
+    letter-spacing: 0%;
+    text-align: center;
+    color: #262626;
+    z-index: 20;
+    transition: opacity 0.3s ease;
+    padding: 0 clamp(15px, 3vw, 30px);
+    box-sizing: border-box;
+    /* Prevent awkward line breaks */
+    white-space: nowrap; /* Keep text on one line for larger screens */
+}
+
+/* Hide prompt text when zoom is active */
+.emotion-wheel-container.zoom-active .prompt-text {
+    opacity: 0;
+}
+
+/* Hide navigation controls when zoom is active */
+.emotion-wheel-container.zoom-active .emotion-wheel-controls {
+    opacity: 0;
+}
+
+/* Cards Container - CURVED QUARTER CIRCLE LAYOUT */
+.emotion-cards-wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: clamp(180px, 25vh, 260px); /* Reverted to reasonable position */
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: clamp(20px, 4vh, 40px) clamp(10px, 2vw, 20px); /* Normal padding */
+    box-sizing: border-box;
+}
+
+.emotion-cards-container {
+    position: relative;
+    width: 100%;
+    max-width: 100vw;
+    height: clamp(350px, 55vh, 450px); /* Increased height for better spacing */
+    cursor: grab;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: visible;
+    transform-style: preserve-3d;
+}
+
+.emotion-cards-container:active {
+    cursor: grabbing;
+}
+
+.emotion-cards-container.spinning {
+    cursor: grabbing;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.emotion-cards-container.spinning .emotion-card {
+    pointer-events: none;
+}
+
+/* Cards Slider - Curved positioning */
+.emotion-cards-slider {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform-origin: center bottom;
+    transform-style: preserve-3d;
+    /* Transform now handled by JavaScript to combine with rotation */
+}
+
+/* Individual emotion cards - curved positioning */
+.emotion-card {
+    position: absolute;
+    /* width and height controlled by JavaScript for precise positioning */
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-origin: center center;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    /* Add perspective for 3D flip effect */
+    perspective: 1000px;
+}
+
+/* Card flip animation */
+.emotion-card.flipping {
+    animation: cardFlip 0.6s ease-in-out forwards;
+    z-index: 100;
+}
+
+/* Add a subtle pulse on initial click */
+.emotion-card.clicked {
+    animation: cardPulse 0.15s ease-out;
+}
+
+@keyframes cardPulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(0.95);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes cardFlip {
+    0% {
+        transform: rotateY(0deg) scale(1);
+    }
+    50% {
+        transform: rotateY(90deg) scale(1.2);
+    }
+    100% {
+        transform: rotateY(0deg) scale(1.2);
+    }
+}
+
+/* Prevent interaction during flip */
+.emotion-card.flipping {
+    pointer-events: none;
+    /* Temporarily disable other cards' hover effects */
+}
+
+/* Disable hover effects on other cards when one is flipping */
+.emotion-cards-container:has(.emotion-card.flipping) .emotion-card:not(.flipping):hover {
+    transform: scale(1) translateY(0);
+}
+
+/* Additional flip state for smooth transition to zoom */
+.emotion-card.flip-to-zoom {
+    animation: flipToZoom 0.4s ease-out forwards;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+@keyframes flipToZoom {
+    0% {
+        transform: rotateY(0deg) scale(1.1);
+    }
+    60% {
+        transform: rotateY(0deg) scale(1.25);
+        box-shadow: 0 25px 65px rgba(0, 0, 0, 0.35);
+    }
+    100% {
+        transform: rotateY(0deg) scale(1.2);
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.emotion-card:hover {
+    transform: scale(1.05) translateY(clamp(-5px, -1vh, -10px));
+    z-index: 10;
+}
+
+.emotion-card.highlighted {
+    transform: scale(1.1) translateY(clamp(-10px, -2vh, -20px));
+    z-index: 15;
+}
+
+.emotion-card svg {
+    width: 100%;
+    height: 100%;
+    border-radius: clamp(8px, 1.5vw, 12px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.emotion-card:hover svg {
+    box-shadow: 0 clamp(12px, 2vh, 16px) clamp(36px, 6vh, 48px) rgba(0, 0, 0, 0.25);
+}
+
+.emotion-card.highlighted svg {
+    box-shadow: 0 clamp(15px, 2.5vh, 20px) clamp(45px, 7.5vh, 60px) rgba(0, 0, 0, 0.3);
+}
+
+/* When zoom is active, hide the container overflow */
+.emotion-cards-wrapper.zoom-active .emotion-cards-container {
+    overflow: visible;
+}
+
+/* Disable scrolling when zoom is active */
+.emotion-wheel-container.zoom-active {
+    overflow: hidden;
+}
+
+.emotion-wheel-container.zoom-active .emotion-cards-container {
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* Card zoom effect */
+.emotion-card.zoomed {
+    position: fixed !important;
+    top: 100px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important; /* Only center horizontally */
+    z-index: 1000 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: clamp(280px, 16vw, 300px) !important; /* Base width */
+    height: clamp(410px, 23.4vw, 439px) !important; /* Height maintains 0.683 aspect ratio */
+    border-radius: clamp(8px, 1.5vw, 12px);
+    overflow: visible !important;
+    opacity: 1 !important;
+    /* Ensure this card can contain absolutely positioned children (close button) */
+}
+
+/* Make SVG fill the entire zoomed card */
+.emotion-card.zoomed svg {
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: inherit;
+    display: block;
+}
+
+/* Hide non-selected cards when zoomed */
+.emotion-cards-slider.zoom-active .emotion-card:not(.zoomed) {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: all 0.3s ease;
+}
+
+
+/* Emotion selection buttons */
+.emotion-selection-buttons {
+    position: absolute;
+    bottom: clamp(-35px, -8vh, -50px);
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: clamp(8px, 1.5vw, 12px);
+    opacity: 0;
+    transform: translateY(clamp(5px, 1vh, 10px));
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.emotion-intensity-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(6px, 1.25vw, 10px);
+    position: absolute;
+    bottom: clamp(20px, 4vh, 30px);
+    width: 100%;
+    align-items: center;
+}
+
+.emotion-card.zoomed .emotion-selection-buttons {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+}
+
+.emotion-selection-btn {
+    padding: clamp(6px, 1.25vw, 10px) clamp(12px, 2.5vw, 20px);
+    border-radius: clamp(16px, 3vw, 24px);
+    border: clamp(1px, 0.25vw, 2px) solid;
+    background: transparent;
+    color: white;
+    font-weight: bold;
+    font-size: clamp(12px, 1.75vw, 16px);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-color: currentColor;
+}
+
+.emotion-selection-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.emotion-selection-btn.primary {
+    background: #0F0F0F;
+    color: white;
+}
+
+.emotion-selection-btn.primary:hover {
+    background: #333;
+}
+
+/* Close button for zoom view */
+.zoom-close-btn {
+    position: absolute; /* Changed from fixed to absolute for card-relative positioning */
+    top: -15px; /* Position above the card */
+    right: -15px; /* Position to the right of the card */
+    width: clamp(24px, 3vw, 30px);
+    height: clamp(24px, 3vw, 30px);
+    border-radius: 50% !important;
+    background: white;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    z-index: 1002; /* Higher than card */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: scale(0);
+    transition: all 0.3s ease;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    pointer-events: auto; /* Ensure button can be clicked */
+    user-select: none; /* Prevent text selection */
+    /* Ensure perfect circle */
+    min-width: clamp(24px, 3vw, 30px) !important;
+    min-height: clamp(24px, 3vw, 30px) !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: none !important;
+}
+
+.zoom-close-btn.visible {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    transition: all 0.3s ease !important;
+}
+
+/* Navigation controls */
+.emotion-wheel-controls {
+    position: absolute;
+    bottom: clamp(15px, 2.5vh, 20px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: clamp(12px, 2.5vw, 20px);
+    z-index: 10;
+    transition: opacity 0.3s ease;
+}
+
+.emotion-wheel-controls button {
+    padding: clamp(6px, 1.25vw, 10px) clamp(16px, 3vw, 25px);
+    border: none;
+    border-radius: clamp(20px, 4vw, 30px);
+    background-color: #0F0F0F;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: clamp(12px, 2vw, 16px);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.emotion-wheel-controls button:hover {
+    background-color: #333;
+    transform: translateY(clamp(-1px, -0.25vh, -2px));
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Sub-emotion buttons for expanded card view */
+.sub-emotion-buttons {
+    position: absolute;
+    bottom: clamp(15px, 3vh, 20px);
+    left: 50%;
+    transform: translateX(-50%) !important; /* Add !important to ensure centering works */
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(9px, 1.5vw, 13px);
+    width: clamp(253px, 29vw, 286px);
+    z-index: 25;
+    pointer-events: auto;
+}
+
+.sub-emotion-btn {
+    /* Updated design following the provided specifications */
+    box-sizing: border-box;
+    
+    /* Auto layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 9px 13px 10px;
+    gap: 4px;
+    
+    width: 121px;
+    height: 55px;
+    border: 1.8px solid; /* Color will be set dynamically via style attribute */
+    border-radius: 22px;
+    background: transparent;
+    
+    /* Text styling */
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 15px;
+    line-height: 20px;
+    color: #073B33;
+    
+    cursor: pointer;
+    transition: all 0.2s ease;
+    z-index: 30;
+    pointer-events: auto;
+    
+    /* Inside auto layout */
+    flex: none;
+    order: 0;
+    flex-grow: 0;
+}
+
+.sub-emotion-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+.sub-emotion-btn:active {
+    transform: translateY(0);
+}
+
+/* Skip button - REMOVED */
+/* .skip-btn {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 30px;
+    border-radius: 15px;
+    border: 2px solid;
+    background: transparent;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    z-index: 20;
+}
+
+.skip-btn.visible {
+    opacity: 1;
+}
+
+.skip-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateX(-50%) translateY(-2px);
+}
+
+.skip-btn:active {
+    transform: translateX(-50%) translateY(0);
+} */
+
+/* Emotion Colors for Expanded Card View */
+.expanded-card-content.happy {
+    border-top: 5px solid #F6C6BA;
+}
+
+.expanded-card-content.sad {
+    border-top: 5px solid #F0BEC5;
+}
+
+.expanded-card-content.surprised {
+    border-top: 5px solid #F6D3AA;
+}
+
+.expanded-card-content.disgusted {
+    border-top: 5px solid #DFBCE3;
+}
+
+.expanded-card-content.unsettled {
+    border-top: 5px solid #90E8DA;
+}
+
+.expanded-card-content.angry {
+    border-top: 5px solid #BBBBDB;
+}
+
+.expanded-card-content.fearful {
+    border-top: 5px solid #81D6E1;
+}
+
+/* Stress Checker Styles */
+.stress-checker-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dimmed background showing emotion wheel */
+.stress-checker-backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    cursor: pointer; /* Make it clickable */
+}
+
+/* Modal window/box */
+.stress-checker-modal {
+    position: relative;
+    width: 600px;
+    max-width: 90vw;
+    height: 500px;
+    max-height: 80vh;
+    background: #FFFFFF;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 40px 30px 30px;
+    z-index: 1001;
+}
+
+/* Close button */
+.stress-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    border: none !important;
+    background: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    z-index: 10;
+    border-radius: 50% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+    /* Ensure perfect circle */
+    min-width: 30px !important;
+    min-height: 30px !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: none !important;
+}
+
+.stress-close-btn:hover {
+    background-color: #f0f0f0;
+}
+
+/* Emoji container with teardrop shape */
+.stress-emoji-container {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    top: -80px; /* Position above the slider */
+    left: 50px; /* Will be updated by JavaScript to follow handle */
+    transform: translateX(-50%);
+    pointer-events: none; /* Allow clicks to pass through */
+    transition: none; /* Remove transition for instant movement */
+}
+
+#stress-emoji-bg {
+    width: 70px;
+    height: 88px;
+}
+
+/* Slider container */
+.stress-slider-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 120px 0 40px 0; /* More top margin to account for emoji */
+    display: flex;
+    justify-content: center;
+    position: relative;
+}
+
+.stress-slider-container svg {
+    width: 100%;
+    height: 100px;
+    cursor: pointer;
+}
+
+#stress-handle {
+    cursor: grab;
+    transition: transform 0.2s ease;
+}
+
+#stress-handle:active {
+    cursor: grabbing;
+}
+
+#stress-progress {
+    transition: x2 0.2s ease;
+}
+
+#mouth {
+    transition: d 0.3s ease;
+}
+
+/* Current percentage positioning */
+#current-percentage {
+    transition: x 0.2s ease;
+}
+
+/* Title above continue button */
+.stress-title {
+    text-align: center;
+    margin-bottom: 35px; /* Reduced from 20px to move text up */
+    margin-top: auto; /* Push to bottom area */
+}
+
+.stress-title h2 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: #262626;
+    margin: 0;
+}
+
+/* Continue button container */
+.stress-continue-btn-container {
+    margin-bottom: 4vw; /* Negative margin to move button up */
+}
+
+.stress-continue-btn {
+    padding: 15px 40px;
+    border: none;
+    border-radius: 30px;
+    background-color: #0F0F0F;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.stress-continue-btn:hover {
+    background-color: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stress-continue-btn:active {
+    transform: translateY(0);
+}
+
+/* Responsive adjustments for stress checker */
+@media (max-width: 768px) {
+    .stress-checker-modal {
+        width: 95vw;
+        height: 450px;
+        padding: 30px 20px 20px;
+    }
+    
+    .stress-title h2 {
+        font-size: 20px;
+        padding: 0 10px;
+    }
+    
+    .stress-slider-container {
+        margin: 140px 0 20px 0; /* Moved down significantly for mobile */
+        max-width: 90vw; /* Make slider wider on mobile */
+    }
+    
+    .stress-slider-container svg {
+        width: 100%;
+        height: 80px; /* Slightly smaller height for mobile */
+    }
+    
+    /* Smaller emoji for mobile */
+    #stress-emoji-bg {
+        width: 50px;
+        height: 62px;
+    }
+    
+    .stress-emoji-container {
+        top: -75px; /* Moved up relative to the new slider position */
+    }
+    
+    .stress-continue-btn {
+        font-size: 16px;
+        padding: 12px 30px;
+    }
+    
+    /* Emotion wheel mobile adjustments */
+    .logo {
+        width: clamp(120px, 25vw, 150px);
+        top: clamp(10px, 2vh, 20px);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .prompt-text {
+        font-size: clamp(18px, 5vw, 24px);
+        top: clamp(50px, 8vh, 80px); /* Moved way down for mobile */
+        padding: 0 clamp(60px, 15vw, 80px);
+        white-space: normal; /* Allow text wrapping on mobile for very long text */
+    }
+    
+    .emotion-cards-container {
+        height: clamp(300px, 45vh, 360px); /* Increased height for mobile */
+        width: clamp(300px, 45vh, 360px);
+    }
+    
+    /* Card sizes controlled by JavaScript */
+    
+    .emotion-card.zoomed {
+        width: clamp(260px, 70vw, 320px) !important; /* Mobile width */
+        height: clamp(381px, 102.5vw, 468px) !important; /* Height maintains 0.683 aspect ratio */
+        top: clamp(60px, 8vh, 100px) !important; /* Better top positioning */
+    }
+    
+    .emotion-wheel-controls {
+        bottom: clamp(10px, 2vh, 15px);
+        gap: clamp(8px, 2vw, 12px);
+    }
+    
+    .emotion-wheel-controls button {
+        padding: clamp(5px, 1vw, 8px) clamp(12px, 2.5vw, 16px);
+        font-size: clamp(11px, 1.75vw, 14px);
+    }
+    
+    /* Smaller sub-emotion buttons for mobile */
+    .sub-emotion-btn {
+        width: clamp(100px, 22vw, 110px) !important;
+        height: clamp(45px, 8vh, 50px) !important;
+        font-size: clamp(12px, 2.5vw, 14px) !important;
+        padding: clamp(6px, 1.5vw, 8px) clamp(10px, 2vw, 12px) !important;
+        border-radius: clamp(18px, 4vw, 22px) !important;
+        border-width: clamp(1.5px, 0.3vw, 2px) !important;
+    }
+    
+    .sub-emotion-buttons {
+        width: clamp(220px, 50vw, 240px) !important;
+        gap: clamp(8px, 1.5vw, 10px) !important;
+        bottom: clamp(20px, 4vh, 25px) !important;
+        transform: translateX(-50%) !important; /* Ensure centering on mobile */
+    }
+    
+    /* Ensure close button appears properly on mobile */
+    .zoom-close-btn {
+        width: clamp(28px, 4vw, 32px) !important;
+        height: clamp(28px, 4vw, 32px) !important;
+        font-size: clamp(18px, 3vw, 22px) !important;
+        top: -15px !important;
+        right: -15px !important;
+        z-index: 1003 !important; /* Even higher for mobile to ensure visibility */
+    }
+}
+
+/* Tablet devices */
+@media (min-width: 769px) and (max-width: 1199px) {
+    .emotion-card.zoomed {
+        width: clamp(360px, 50vw, 450px) !important; /* Tablet width */
+        height: clamp(527px, 73.2vw, 659px) !important; /* Height maintains 0.683 aspect ratio */
+        top: clamp(80px, 10vh, 120px) !important;
+    }
+    
+    /* Medium-sized sub-emotion buttons for tablets */
+    .sub-emotion-btn {
+        width: clamp(110px, 18vw, 130px) !important;
+        height: clamp(50px, 8vh, 60px) !important;
+        font-size: clamp(13px, 2vw, 16px) !important;
+        padding: clamp(8px, 1.5vw, 10px) clamp(12px, 2vw, 15px) !important;
+        border-radius: clamp(20px, 3vw, 25px) !important;
+        border-width: clamp(1.5px, 0.3vw, 2px) !important;
+    }
+    
+    .sub-emotion-buttons {
+        width: clamp(250px, 40vw, 280px) !important;
+        gap: clamp(10px, 2vw, 15px) !important;
+        bottom: clamp(25px, 4vh, 35px) !important;
+        transform: translateX(-50%) !important; /* Ensure centering on tablets */
+    }
+    
+    /* Ensure close button appears properly on tablets */
+    .zoom-close-btn {
+        width: clamp(26px, 3.5vw, 30px) !important;
+        height: clamp(26px, 3.5vw, 30px) !important;
+        font-size: clamp(16px, 2.8vw, 20px) !important;
+        top: -15px !important;
+        right: -15px !important;
+        z-index: 1003 !important; /* Higher z-index for tablets */
+    }
+}
+
+/* Short landscape tablets (like 1024x600) - need special handling */
+@media (min-width: 769px) and (max-width: 1199px) and (max-height: 700px) {
+    .emotion-card.zoomed {
+        width: clamp(240px, 28vw, 300px) !important; /* Short landscape width */
+        height: clamp(351px, 41vw, 439px) !important; /* Height maintains 0.683 aspect ratio */
+        top: clamp(20px, 3vh, 40px) !important; /* Reduced top margin to fit taller card */
+    }
+    
+    /* Adjust sub-emotion buttons for short screens */
+    .sub-emotion-btn {
+        width: clamp(100px, 16vw, 120px) !important;
+        height: clamp(40px, 6vh, 50px) !important;
+        font-size: clamp(12px, 1.8vw, 15px) !important;
+        padding: clamp(6px, 1.2vw, 8px) clamp(10px, 1.8vw, 12px) !important;
+        border-radius: clamp(18px, 2.5vw, 22px) !important;
+        border-width: clamp(1.3px, 0.25vw, 1.8px) !important;
+    }
+    
+    .sub-emotion-buttons {
+        width: clamp(220px, 35vw, 260px) !important;
+        gap: clamp(8px, 1.5vw, 12px) !important;
+        bottom: clamp(15px, 3vh, 25px) !important;
+        transform: translateX(-50%) !important; /* Ensure centering on short landscape tablets */
+    }
+    
+    /* Ensure close button appears properly on short landscape tablets */
+    .zoom-close-btn {
+        width: clamp(24px, 3vw, 28px) !important;
+        height: clamp(24px, 3vw, 28px) !important;
+        font-size: clamp(16px, 2.5vw, 18px) !important;
+        top: -15px !important;
+        right: -15px !important;
+        z-index: 1003 !important;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .stress-checker-modal {
+        width: 95vw;
+        height: 400px;
+        padding: 25px 15px 15px;
+    }
+    
+    .stress-slider-container {
+        margin: 120px 0 15px 0; /* Moved down more for small screens */
+        max-width: 85vw; /* Ensure slider fits well */
+    }
+    
+    .stress-slider-container svg {
+        height: 70px; /* Smaller height for very small screens */
+    }
+    
+    /* Even smaller emoji for very small screens */
+    #stress-emoji-bg {
+        width: 40px;
+        height: 50px;
+    }
+    
+    .stress-emoji-container {
+        top: -65px; /* Adjust position for even smaller emoji */
+    }
+    
+    .stress-title h2 {
+        font-size: 18px;
+        padding: 0 5px;
+    }
+    
+    .logo {
+        width: clamp(120px, 25vw, 150px);
+        top: clamp(10px, 2vh, 20px);
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .prompt-text {
+        font-size: clamp(18px, 5vw, 24px);
+        top: clamp(60px, 10vh, 90px); /* Moved way down for small mobile */
+        padding: 0 clamp(60px, 15vw, 80px);
+        white-space: normal; /* Allow text wrapping on small mobile */
+        width: clamp(300px, 85vw, 400px); /* Slightly wider for better text flow */
+    }
+    
+    .emotion-cards-container {
+        height: clamp(250px, 40vh, 300px); /* Adjusted for small mobile */
+        width: clamp(250px, 40vh, 300px);
+    }
+    
+    /* Card sizes controlled by JavaScript */
+    
+    .emotion-card.zoomed {
+        width: clamp(230px, 80vw, 280px) !important; /* Small mobile width */
+        height: clamp(337px, 117vw, 410px) !important; /* Height maintains 0.683 aspect ratio */
+        top: clamp(40px, 6vh, 80px) !important; /* Better top positioning */
+    }
+    
+    .sub-emotion-buttons {
+        width: clamp(200px, 80vw, 220px) !important;
+        gap: clamp(6px, 1vw, 8px) !important;
+        bottom: clamp(15px, 3vh, 20px) !important;
+        transform: translateX(-50%) !important; /* Ensure centering on small mobile */
+    }
+    
+    /* Even smaller sub-emotion buttons for very small screens */
+    .sub-emotion-btn {
+        width: clamp(90px, 35vw, 100px) !important;
+        height: clamp(40px, 7vh, 45px) !important;
+        font-size: clamp(11px, 2.2vw, 13px) !important;
+        padding: clamp(5px, 1.2vw, 7px) clamp(8px, 1.8vw, 10px) !important;
+        border-radius: clamp(16px, 3.5vw, 20px) !important;
+        border-width: clamp(1.2px, 0.25vw, 1.8px) !important;
+    }
+}
+
+/* Large screens optimization */
+@media (min-width: 1200px) {
+    .emotion-cards-container {
+        height: clamp(450px, 50vh, 550px); /* Increased for better spacing */
+        width: clamp(450px, 50vh, 550px);
+    }
+    
+    /* Card sizes controlled by JavaScript */
+    
+    .logo {
+        width: clamp(200px, 18vw, 250px);
+    }
+    
+    .prompt-text {
+        font-size: clamp(32px, 3.5vw, 42px);
+    }
+    
+    /* Move sub-emotion buttons 10% to the right for large screens */
+    .sub-emotion-buttons {
+        transform: translateX(-47%) !important; /* Move 10% right from center */
+    }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 1600px) {
+    .emotion-cards-container {
+        height: clamp(500px, 45vh, 600px); /* Increased for ultra-wide */
+        width: clamp(500px, 45vh, 600px);
+    }
+}

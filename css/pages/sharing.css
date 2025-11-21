@@ -1,0 +1,1288 @@
+/* Full page background */
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    overflow: hidden;
+    position: fixed; /* Prevent any scrolling issues */
+}
+
+/* Sharing Container */
+.sharing-container {
+    min-height: 100vh;
+    background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: white;
+    font-family: 'Outfit', sans-serif;
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+    opacity: 0;
+    animation: fadeInFromBlack 1s ease-in-out forwards;
+}
+
+@keyframes fadeInFromBlack {
+    0% {
+        opacity: 0;
+        background: black;
+    }
+    50% {
+        opacity: 0.5;
+        background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    }
+    100% {
+        opacity: 1;
+        background: radial-gradient(ellipse at center, #fc895c 0%, #045bde 100%);
+    }
+}
+
+/* Logo */
+.logo {
+    position: absolute;
+    top: clamp(1.5rem, 4vw, 3rem);
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0.9;
+    z-index: 10;
+    pointer-events: none; /* Prevent interaction issues */
+}
+
+.logo svg {
+    width: clamp(150px, 20vw, 300px);
+    height: auto;
+}
+
+.logo svg path {
+    fill: white;
+}
+
+/* Card Container */
+.card-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100vh;
+    perspective: 1000px;
+    position: relative;
+    padding: clamp(1rem, 4vh, 4rem) clamp(0.5rem, 2vw, 2rem);
+    box-sizing: border-box;
+}
+
+/* Session Card */
+.session-card {
+    position: relative;
+    width: clamp(300px, 35vw, 400px);
+    height: clamp(520px, 65vh, 720px);
+    perspective: 1000px;
+    cursor: pointer;
+}
+
+/* Session Card Close Button */
+.session-card-close {
+    position: absolute;
+    top: -15px;
+    left: -15px; /* Changed from right to left */
+    width: clamp(32px, 4vw, 40px);
+    height: clamp(32px, 4vw, 40px);
+    border-radius: 50% !important;
+    background: white;
+    border: none !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: clamp(20px, 3vw, 24px);
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-family: Arial, sans-serif;
+    line-height: 1;
+    user-select: none;
+    opacity: 0; /* Hidden by default */
+    visibility: hidden;
+    pointer-events: none;
+    /* Ensure perfect circle */
+    min-width: clamp(32px, 4vw, 40px) !important;
+    min-height: clamp(32px, 4vw, 40px) !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border-radius: 50% !important;
+    border: none !important;
+}
+
+/* Show close button only when card is flipped */
+.session-card.flipped .session-card-close {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.session-card-close:hover {
+    background: #f0f0f0;
+    transform: scale(1.1);
+}
+
+.session-card-close:active {
+    transform: scale(0.95);
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+}
+
+.session-card.flipped .card-inner {
+    transform: rotateY(180deg);
+}
+
+/* Card Sides */
+.card-front,
+.card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-front {
+    transform: rotateY(0deg);
+}
+
+.card-back {
+    transform: rotateY(180deg);
+    background: #FFFFFF;
+    position: relative;
+    border-radius: 15px;
+}
+
+/* Card Front Content */
+.card-front svg {
+    width: 100%;
+    height: 100%;
+}
+
+/* Completion Text */
+.completion-text {
+    position: absolute;
+    width: clamp(220px, 26vw, 300px);
+    height: auto;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    
+    font-family: 'Inter', sans-serif;
+    font-style: italic;
+    font-weight: 900;
+    font-size: clamp(18px, 2.8vw, 30px);
+    line-height: clamp(24px, 3.5vw, 38px);
+    text-align: center;
+    color: #FFFFFF;
+    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+    padding: 0 1rem;
+    
+    opacity: 0;
+    animation: fadeInText 1.5s ease-in-out 0.5s forwards;
+}
+
+@keyframes fadeInText {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, -50%) translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translate(-50%, -50%) translateY(0);
+    }
+}
+
+/* Card Hover Effects */
+.session-card:hover:not(.flipped) {
+    transform: translateY(-5px) scale(1.02);
+}
+
+/* Responsive Design */
+/* PC (768px-1440px) */
+@media (min-width: 768px) and (max-width: 1440px) {
+    .session-card {
+        width: clamp(320px, 45vw, 450px);
+        height: clamp(480px, 70vh, 620px);
+    }
+    
+    .completion-text {
+        width: clamp(200px, 30vw, 260px);
+        font-size: clamp(16px, 2.5vw, 26px);
+        line-height: clamp(22px, 3.2vw, 34px);
+    }
+}
+
+/* Tablets (475px-768px) */
+
+@media (min-width: 475px) and (max-width: 767px) {
+    .sharing-container {
+        padding: 1rem;
+    }
+    
+    .logo {
+        top: 1rem;
+    }
+    
+    .logo svg {
+        width: clamp(120px, 30vw, 200px);
+    }
+    
+    .session-card {
+        width: clamp(300px, 85vw, 400px);
+        height: clamp(420px, 65vh, 550px);
+    }
+    
+    .completion-text {
+        width: clamp(180px, 65vw, 230px);
+        font-size: clamp(15px, 4vw, 22px);
+        line-height: clamp(20px, 5vw, 28px);
+        padding: 0 1rem;
+    }
+    
+    .card-container {
+        padding-top: 6rem;
+    }
+}
+
+/* Mobile (<475px) */
+@media (max-width: 474px) {
+    .logo svg {
+        width: clamp(100px, 50vw, 160px);
+    }
+    
+    .session-card {
+        width: clamp(280px, 90vw, 360px);
+        height: clamp(380px, 70vh, 480px);
+    }
+    
+    .completion-text {
+        width: clamp(160px, 75vw, 200px);
+        font-size: clamp(14px, 5vw, 18px);
+        line-height: clamp(18px, 6vw, 24px);
+        padding: 0 0.5rem;
+    }
+}
+
+/* Loading Animation */
+.sharing-container.loading {
+    opacity: 0.7;
+}
+
+.session-card.loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 0.8; 
+        transform: scale(1);
+    }
+    50% { 
+        opacity: 1; 
+        transform: scale(1.02);
+    }
+}
+
+n/* Card Back Styles - Additional styling */
+
+.back-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../assets/images/card_bg.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border-radius: 15px;
+    z-index: 0;
+}
+
+.back-frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    overflow: hidden;
+    z-index: 1;
+    pointer-events: none; /* Allow interaction with content underneath */
+}
+
+.back-logo {
+    position: absolute;
+    top: 0.2rem;
+    right: 0.5rem;
+    z-index: 3;
+}
+
+.back-logo svg {
+    width: clamp(80px, 12vw, 140px);
+    height: auto;
+}
+
+.back-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    color: #1D1C1A;
+    font-family: 'Outfit', sans-serif;
+}
+
+.session-date-container {
+    position: absolute;
+    left: 0.5rem;
+    bottom: 2rem;
+    z-index: 3;
+}
+
+.session-date {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: clamp(14px, 2.2vw, 20px);
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #1D1C1A;
+    margin: 0;
+}
+
+.conversation-insights {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.insight-item {
+    position: absolute;
+    background: transparent;
+    border: none;
+    padding: 0;
+    max-width: clamp(100px, 45%, 200px);
+    overflow: hidden;
+}
+
+/* Responsive insight positioning using CSS classes */
+.insight-feelings {
+    left: clamp(3%, 5vw, 8%);
+    top: clamp(3%, 5vh, 8%);
+}
+
+.insight-sensations {
+    left: clamp(15%, 25vw, 30%);
+    top: clamp(10%, 18vw, 22%);
+}
+
+.insight-thoughts {
+    left: clamp(45%, 50vw, 55%);
+    top: clamp(35%, 40vh, 45%);
+}
+
+.insight-impulses {
+    left: clamp(3%, 5vw, 8%);
+    top: clamp(50%, 50vh, 60%);
+}
+
+.insight-needs {
+    left: clamp(40%, 45vw, 50%);
+    top: clamp(65%, 70vh, 75%);
+}
+
+.insight-label {
+    font-family: 'Amandine', 'Georgia', 'Times New Roman', serif !important;
+    font-style: italic !important;
+    font-weight: 500 !important;
+    font-size: clamp(10px, 5vw, 20px);
+    line-height: 1.25;
+    letter-spacing: 0.05em;
+    color: #1D1C1A;
+    margin-bottom: 0.5rem; /* Increased spacing between label and text */
+}
+
+.insight-text {
+    font-family: 'Outfit', 'Arial', sans-serif !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    font-size: clamp(10px, 5vw, 20px); 
+    line-height: 1.3; /* Improved line height */
+    color: #1D1C1A;
+    margin: 0;
+}
+
+.bottom-title {
+    position: absolute;
+    left: 0.5rem;
+    bottom: 0.1rem;
+    z-index: 3;
+    text-align: left;
+}
+
+.bottom-title h2 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: clamp(12px, 2vw, 24px);
+    line-height: 1.33;
+    color: #1D1C1A;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* Download Button */
+.download-button {
+    position: absolute;
+    bottom: clamp(0rem, 0vh, 0rem);
+    right: clamp(0.5rem, 2vw, 1rem);
+    z-index: 4;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.9;
+}
+
+.download-button:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.download-button:active {
+    transform: scale(0.95);
+}
+
+.download-button svg {
+    width: clamp(35px, 8vw, 45px);
+    height: clamp(35px, 8vw, 45px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Font fallbacks for Amandine */
+@font-face {
+    font-family: 'Amandine';
+    src: local('Georgia'), local('Times New Roman'), serif;
+    font-style: italic;
+    font-weight: 500;
+}
+
+/* Ensure proper font loading order */
+.insight-label {
+    font-family: 'Amandine', 'Georgia', 'Times New Roman', serif !important;
+    font-style: italic !important;
+    font-weight: 500 !important;
+}
+
+.insight-text {
+    font-family: 'Outfit', 'Arial', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Responsive adjustments for back side */
+/* Tablets (475px-768px) */
+@media (min-width: 475px) and (max-width: 767px) {
+    .back-logo {
+        top: 1.2rem;
+        right: 1.2rem;
+    }
+    
+    .back-logo svg {
+        width: clamp(70px, 15vw, 120px);
+    }
+    
+    .insight-item {
+        max-width: 50%; /* Slightly larger on tablets */
+    }
+    
+    .insight-label {
+        font-size: clamp(12px, 2.5vw, 18px);
+        margin-bottom: 0.4rem;
+    }
+    
+    .insight-text {
+        font-size: clamp(10px, 2.5vw, 18px); /* Reduced from clamp(12px, 2.8vw, 20px) */
+    }
+    
+    .session-date-container {
+        left: 1.5rem;
+        bottom: 5rem;
+    }
+    
+    .session-date {
+        font-size: clamp(12px, 2.8vw, 18px);
+    }
+    
+    .bottom-title {
+        left: 1.5rem;
+        bottom: 1.5rem;
+    }
+    
+    .bottom-title h2 {
+        font-size: clamp(20px, 5vw, 36px);
+    }
+    
+    .download-button {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
+    
+    .download-button svg {
+        width: clamp(30px, 10vw, 40px);
+        height: clamp(30px, 10vw, 40px);
+    }
+}
+
+@media (max-width: 480px) {
+    .back-logo {
+        top: 1rem;
+        right: 1rem;
+    }
+    
+    .back-logo svg {
+        width: clamp(60px, 18vw, 100px);
+    }
+    
+    .insight-item {
+        max-width: 55%; /* Adjusted for mobile */
+    }
+    
+    .insight-label {
+        font-size: clamp(10px, 3vw, 16px);
+        margin-bottom: 0.3rem;
+    }
+    
+    .insight-text {
+        font-size: clamp(9px, 2.8vw, 16px); /* Reduced from clamp(10px, 3.2vw, 18px) */
+    }
+    
+    .session-date-container {
+        left: 1rem;
+        bottom: 2.5rem;
+    }
+    
+    .session-date {
+        font-size: clamp(10px, 3.5vw, 16px);
+    }
+    
+    .bottom-title {
+        left: 1rem;
+        bottom: 1rem;
+    }
+    
+    .bottom-title h2 {
+        font-size: clamp(16px, 5.5vw, 30px);
+    }
+    
+    .download-button {
+        bottom: 1rem;
+        right: 1rem;
+    }
+    
+    .download-button svg {
+        width: clamp(28px, 12vw, 38px);
+        height: clamp(28px, 12vw, 38px);
+    }
+}
+
+/* Typography Responsive Scaling */
+h1, h2, h3 {
+    font-size: clamp(1.2rem, 4vw, 2.5rem);
+    line-height: clamp(1.3, 4.5vw, 1.5);
+}
+
+.card-title {
+    font-size: clamp(1.5rem, 5vw, 3rem) !important;
+    line-height: clamp(1.2, 3vw, 1.4);
+    margin: clamp(0.5rem, 2vh, 1.5rem) 0;
+}
+
+/* Insight font sizes are defined above in the main section */
+
+/* Button and Interactive Elements */
+.action-button, .flip-button, .back-button {
+    padding: clamp(0.5rem, 2vw, 1rem) clamp(1rem, 3vw, 2rem);
+    font-size: clamp(0.8rem, 2.5vw, 1.1rem);
+    border-radius: clamp(0.5rem, 1vw, 1rem);
+    margin: clamp(0.25rem, 1vh, 0.5rem);
+}
+
+/* Navigation and Logo */
+.nav-container, .logo-container {
+    padding: clamp(0.5rem, 2vh, 1.5rem) clamp(1rem, 3vw, 2rem);
+}
+
+.logo {
+    width: clamp(120px, 15vw, 200px);
+    height: auto;
+}
+
+/* Additional Mobile Optimizations */
+@media (max-width: 480px) and (orientation: portrait) {
+    .card-container {
+        padding: 1rem 0.5rem;
+        height: calc(100vh - 2rem);
+    }
+    
+    .session-card {
+        width: 95vw;
+        height: 85vh;
+        min-height: 500px;
+    }
+    
+    .card-title {
+        font-size: 1.8rem !important;
+        margin: 0.5rem 0;
+    }
+}
+
+/* Landscape Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .session-card {
+        width: 85vw;
+        height: 95vh;
+        max-height: 600px;
+    }
+    
+    .card-container {
+        padding: 0.5rem;
+    }
+}
+
+/* High DPI Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .insight-text, .insight-label {
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+    }
+}
+
+/* Popup Overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.popup-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Popup Window */
+.popup-window {
+    position: relative;
+    width: clamp(320px, 90vw, 735px);
+    height: clamp(400px, 80vh, 544px);
+    background: #FDC2AE;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transform: scale(0.8) translateY(20px);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.popup-overlay.show .popup-window {
+    transform: scale(1) translateY(0);
+}
+
+/* Close Button */
+.popup-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.2s ease;
+    z-index: 1001;
+    /* Ensure perfect circle */
+    min-width: 32px !important;
+    min-height: 32px !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border: none !important;
+    border-radius: 50% !important;
+}
+
+.popup-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Popup Content */
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: clamp(20px, 5vh, 40px);
+    text-align: center;
+}
+
+.popup-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(24px, 4.5vw, 32px);
+    line-height: clamp(30px, 5vw, 40px);
+    color: #000000;
+    margin: 0 0 clamp(15px, 3vh, 25px) 0;
+}
+
+.popup-subtitle {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: clamp(16px, 2.8vw, 20px);
+    line-height: clamp(20px, 3.5vw, 25px);
+    color: #000000;
+    margin: 0 0 clamp(25px, 5vh, 40px) 0;
+    max-width: clamp(280px, 80%, 530px);
+}
+
+/* Amount Buttons */
+.amount-buttons {
+    display: flex;
+    gap: clamp(10px, 2vw, 15px);
+    margin-bottom: clamp(15px, 3vh, 25px); /* Reduced from 30px/6vh/50px */
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.amount-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(90px, 15vw, 127px);
+    height: clamp(70px, 12vh, 93px);
+    background: #FFFFFF;
+    border: 3px solid #000000;
+    border-radius: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 3vw, 24px);
+    line-height: 30px;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.amount-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.amount-btn.selected {
+    background: #000000;
+    color: #FFFFFF;
+    border: 3px solid #000000;
+}
+
+/* OR Text */
+.or-text {
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 20px;
+    line-height: 25px;
+    text-align: center;
+    color: #000000;
+    margin-bottom: clamp(15px, 3vh, 20px); /* Reduced from 20px/4vh/30px */
+}
+
+/* Custom Amount Button */
+.custom-amount-btn {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 17px 6px;
+    gap: 10px;
+    width: clamp(320px, 70vw, 566px);
+    height: clamp(45px, 8vh, 57px);
+    background: #FFFFFF;
+    border: 3px solid #000000;
+    border-radius: 20px;
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 25px;
+    color: #000000;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: clamp(20px, 4vh, 30px); /* Reduced from 30px/6vh/50px */
+}
+
+.custom-amount-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.custom-amount-btn.selected {
+    background: #000000;
+    color: #FFFFFF;
+    border: 3px solid #000000;
+}
+
+/* Confirm Button */
+.confirm-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(200px, 40vw, 251px);
+    height: clamp(45px, 8vh, 52px);
+    background: #000000;
+    border: none;
+    border-radius: 30px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(16px, 2.8vw, 20px);
+    line-height: 25px;
+    color: #FFFFFF;
+    cursor: pointer;
+    margin-bottom: clamp(10px, 2vh, 15px); /* Reduced from 15px/3vh/20px */
+    transition: all 0.3s ease;
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.confirm-btn.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.confirm-btn.active:hover {
+    background: #333333;
+    transform: translateY(-1px);
+}
+
+/* Maybe Later Button */
+.maybe-later-btn {
+    background: none;
+    border: none;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: clamp(16px, 2.8vw, 20px);
+    line-height: 25px;
+    color: #6E6E6E;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.maybe-later-btn:hover {
+    color: #000000;
+}
+
+/* Responsive adjustments for popup */
+@media (max-width: 768px) {
+    .popup-window {
+        margin: 20px;
+        height: auto;
+        min-height: 400px;
+    }
+    
+    .amount-buttons {
+        gap: 8px;
+    }
+    
+    .amount-btn {
+        width: clamp(70px, 20vw, 90px);
+        height: clamp(60px, 15vw, 70px);
+        font-size: clamp(16px, 4vw, 18px);
+    }
+    
+    .or-text {
+        font-size: clamp(16px, 4vw, 18px);
+        margin-bottom: clamp(15px, 3vh, 20px);
+    }
+    
+    .custom-amount-btn {
+        width: clamp(280px, 85vw, 400px);
+        height: clamp(40px, 7vh, 50px);
+        font-size: clamp(16px, 3.5vw, 18px);
+        padding: 4px 15px 5px;
+        margin-bottom: clamp(20px, 4vh, 30px);
+    }
+}
+
+@media (max-width: 480px) {
+    .popup-content {
+        padding: 20px 15px;
+    }
+    
+    .amount-buttons {
+        gap: 6px;
+    }
+    
+    .amount-btn {
+        width: 70px;
+        height: 60px;
+        font-size: 16px;
+        border-width: 2px;
+    }
+    
+    .or-text {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+    
+    .custom-amount-btn {
+        width: clamp(250px, 90vw, 320px);
+        height: 45px;
+        font-size: 16px;
+        padding: 4px 12px 5px;
+        margin-bottom: 20px;
+        border-width: 2px;
+    }
+}
+
+/* Sharing Overlay */
+.sharing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.sharing-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Sharing Window */
+.sharing-window {
+    position: relative;
+    width: clamp(320px, 90vw, 735px);
+    height: clamp(400px, 80vh, 544px);
+    background: #FDC2AE;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    transform: scale(0.8) translateY(20px);
+    transition: transform 0.3s ease;
+    overflow: hidden;
+}
+
+.sharing-overlay.show .sharing-window {
+    transform: scale(1) translateY(0);
+}
+
+/* Sharing Close Button */
+.sharing-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50% !important;
+    background: rgba(255, 255, 255, 0.2);
+    transition: background 0.2s ease;
+    z-index: 1002;
+    /* Ensure perfect circle */
+    min-width: 32px !important;
+    min-height: 32px !important;
+    flex-shrink: 0 !important;
+    aspect-ratio: 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    border: none !important;
+    border-radius: 50% !important;
+}
+
+.sharing-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Sharing Content */
+.sharing-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: clamp(20px, 5vh, 40px);
+    text-align: center;
+}
+
+.sharing-title {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(24px, 4.5vw, 32px);
+    line-height: clamp(30px, 5vw, 40px);
+    color: #000000;
+    margin: 0 0 clamp(15px, 3vh, 25px) 0;
+    max-width: clamp(280px, 80%, 479px);
+}
+
+.sharing-subtitle {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: clamp(16px, 2.8vw, 20px);
+    line-height: clamp(20px, 3.5vw, 25px);
+    color: #000000;
+    margin: 0 0 clamp(25px, 5vh, 40px) 0;
+    max-width: clamp(280px, 80%, 480px);
+}
+
+/* URL Share Container */
+.url-share-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: clamp(30px, 6vh, 50px);
+    width: 100%;
+    max-width: clamp(300px, 85%, 623px);
+}
+
+.url-input-box {
+    flex: 1;
+    height: clamp(60px, 12vh, 80px);
+    background: #FFFFFF;
+    border: 2px solid #000000;
+    border-radius: 1000px;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(20px, 4vw, 30px);
+    margin-right: clamp(10px, 2vw, 15px);
+}
+
+.url-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 400;
+    font-size: clamp(16px, 3vw, 20px);
+    color: #000000;
+    user-select: all;
+}
+
+.copy-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: clamp(100px, 20vw, 127px);
+    height: clamp(45px, 8vh, 52px);
+    background: #000000;
+    border: none;
+    border-radius: 30px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: clamp(18px, 3vw, 24px);
+    line-height: 30px;
+    color: #FFFFFF;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.copy-button:hover {
+    background: #333333;
+    transform: translateY(-1px);
+}
+
+.copy-button:active {
+    transform: scale(0.95);
+}
+
+/* Social Buttons */
+.social-buttons {
+    display: flex;
+    gap: clamp(15px, 3vw, 25px);
+    justify-content: center;
+    flex-wrap: wrap;
+    align-items: flex-end; /* Align buttons to bottom baseline */
+}
+
+.social-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: clamp(60px, 12vw, 74px);
+    height: auto; /* Let height be determined by content */
+}
+
+.social-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+}
+
+.social-btn:active {
+    transform: scale(0.95);
+}
+
+.social-btn svg {
+    width: clamp(47px, 10vw, 47px); /* Fixed consistent size for all SVGs */
+    height: clamp(47px, 10vw, 47px);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    display: block;
+    margin-bottom: 5px; /* Consistent spacing between SVG and text */
+}
+
+/* Ensure text in SVGs renders correctly */
+.social-btn svg text,
+.social-btn svg tspan {
+    font-family: 'Outfit', sans-serif !important;
+    font-weight: 400 !important;
+}
+
+/* Download button - no special styles needed, uses common social-btn styles */
+
+.download-text {
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 13px;
+    text-align: center;
+    color: #000000;
+    margin-top: 0;
+    white-space: nowrap;
+}
+
+/* Social button text styles - unified for all platforms */
+.whatsapp-text,
+.linkedin-text,
+.twitter-text,
+.download-text {
+    font-family: 'Outfit', sans-serif;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 11px;
+    line-height: 13px;
+    text-align: center;
+    color: #000000;
+    margin-top: 0;
+    white-space: nowrap;
+    min-height: 26px; /* Consistent height for text area to align baselines */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Responsive adjustments for sharing window */
+@media (max-width: 768px) {
+    .sharing-window {
+        margin: 20px;
+        height: auto;
+        min-height: 500px;
+    }
+    
+    .url-share-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .url-input-box {
+        margin-right: 0;
+        width: 100%;
+    }
+    
+    .copy-button {
+        width: 100%;
+        max-width: 200px;
+    }
+    
+    .social-buttons {
+        gap: 12px;
+    }
+    
+    .social-btn svg {
+        width: clamp(40px, 12vw, 47px);
+        height: clamp(40px, 12vw, 47px);
+    }
+    
+    .social-btn {
+        width: clamp(40px, 12vw, 47px);
+    }
+}
+
+@media (max-width: 480px) {
+    .sharing-content {
+        padding: 20px 15px;
+    }
+    
+    .social-buttons {
+        gap: 10px;
+    }
+    
+    .social-btn svg {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .social-btn {
+        width: 40px;
+    }
+    
+    .whatsapp-text,
+    .linkedin-text,
+    .twitter-text,
+    .download-text {
+        font-size: 10px;
+        line-height: 12px;
+    }
+    
+    .url-input-box {
+        height: 60px;
+        padding: 0 20px;
+    }
+    
+    .copy-button {
+        height: 45px;
+        font-size: 18px;
+    }
+}
