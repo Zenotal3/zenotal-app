@@ -569,7 +569,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         try {
             console.log('Fetching TTS with timestamps for:', text.substring(0, 50) + '...');
-            const res = await fetch(`${API_BASE_URL}/api/tts`, {
+            const res = await fetch(`${API_BASE_URL}/tts`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ 
