@@ -1288,12 +1288,7 @@ Now let's move into a guided meditation practice.`;
             max-width: 90%;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         `;
-        warningDiv.innerHTML = `
-            <strong>⚠️ Server Not Running</strong><br>
-            Please start the Flask server: Double-click <code>start_server.bat</code> or run <code>python proxy.py</code>
-            <button onclick="this.parentElement.remove()" style="margin-left: 10px; background: white; color: #ff6b6b; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">×</button>
-        `;
-        document.body.appendChild(warningDiv);
+        // Server warning disabled for Vercel deployment
         
         // Auto-remove after 10 seconds
         setTimeout(() => {
