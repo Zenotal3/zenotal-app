@@ -11,7 +11,7 @@ console.log('🌐 Using InsForge Functions:', INSFORGE_BASE_URL);
 async function testAPIConnection() {
     try {
         console.log('🔍 Testing InsForge connection...');
-        console.log('📍 InsForge Functions URL:', INSFORGE_FUNCTIONS_URL);
+        console.log('📍 InsForge Functions URL:', INSFORGE_BASE_URL);
         console.log('✅ InsForge Edge Functions ready!');
         return true;
     } catch (error) {
