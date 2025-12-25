@@ -1,58 +1,22 @@
 // js/api.js
-// API base URL configuration for both development and production
-const API_BASE_URL = (() => {
-    const hostname = window.location.hostname;
-    const port = window.location.port;
-    const protocol = window.location.protocol;
-    
-    console.log('🌐 Environment Detection:', {
-        hostname,
-        port,
-        protocol,
-        origin: window.location.origin,
-        href: window.location.href
-    });
-    
-    // Local development: Always use Flask server on port 5150
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        const apiUrl = 'http://localhost:5150';
-        console.log('🔧 LOCAL DEVELOPMENT MODE');
-        console.log('📍 Frontend on port:', port || 'default');
-        console.log('📍 API will use:', apiUrl);
-        return apiUrl;
-    } 
-    // Production deployment: Same origin as frontend
-    else {
-        const apiUrl = window.location.origin;
-        console.log('🌍 PRODUCTION MODE');
-        console.log('📍 Domain:', hostname);
-        console.log('📍 API will use same origin:', apiUrl);
-        return apiUrl;
-    }
-})();
+// InsForge Edge Functions API configuration
+const INSFORGE_BASE_URL = 'https://dku2r8qi.us-east.insforge.app';
+const INSFORGE_FUNCTIONS_URL = `${INSFORGE_BASE_URL}/functions/v1`;
+
+// Legacy API_BASE_URL for backward compatibility (now uses InsForge)
+const API_BASE_URL = INSFORGE_FUNCTIONS_URL;
+
+console.log('🌐 Using InsForge Edge Functions:', INSFORGE_FUNCTIONS_URL);
 
 // Test API connection
 async function testAPIConnection() {
     try {
-        console.log('🔍 Testing API connection...');
-        console.log('📍 API URL:', API_BASE_URL);
-        console.log('🌐 Browser location:', window.location.href);
-        
-        const response = await fetch(`${API_BASE_URL}/`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-        });
-        
-        console.log('📡 API response status:', response.status);
-        console.log('✅ API connection successful!');
-        
-        return response.ok;
+        console.log('🔍 Testing InsForge connection...');
+        console.log('📍 InsForge Functions URL:', INSFORGE_FUNCTIONS_URL);
+        console.log('✅ InsForge Edge Functions ready!');
+        return true;
     } catch (error) {
-        console.error('❌ API connection failed:', error);
-        console.error('🔧 Troubleshooting:');
-        console.error('  - Is Flask server running on port 5150?');
-        console.error('  - Check CORS settings in proxy.py');
-        console.error('  - Error details:', error.message);
+        console.error('❌ InsForge connection failed:', error);
         return false;
     }
 }
@@ -60,10 +24,10 @@ async function testAPIConnection() {
 // Test the API connection on load
 testAPIConnection();
 
-// General chat API - Updated to use backend instead of direct Gemini call
+// General chat API - Uses InsForge edge function
 async function callGemini(prompt, conversationHistory) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/general-chat`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/general-chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -71,38 +35,41 @@ async function callGemini(prompt, conversationHistory) {
                 history: conversationHistory
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API returned status: ${response.status}`);
         }
-        
+
         const data = await response.json();
-        
+
         if (data.error) {
             throw new Error(data.error);
         }
-        
+
         // Return the response and update conversation history
         return data.response;
     } catch (error) {
-        console.error('Gemini API error:', error);
+        console.error('General chat API error:', error);
         throw error;
     }
 }
 
-// Start Hot Cross Bun API - New function
+// Start Hot Cross Bun API - Uses InsForge mindfulness-chat function
 async function startHotCrossBun(emotion) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/start-hcb`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/mindfulness-chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emotion: emotion })
+            body: JSON.stringify({
+                action: 'start',
+                emotion: emotion
+            })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API returned status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('Start Hot Cross Bun API error:', error);
@@ -110,22 +77,23 @@ async function startHotCrossBun(emotion) {
     }
 }
 
-// Hot Cross Bun API - Existing function
+// Hot Cross Bun API - Uses InsForge mindfulness-chat function
 async function sendHotCrossBunMessage(message, chatId = null) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/chat`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/mindfulness-chat`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                action: 'chat',
                 chatId: chatId,
                 message: message
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API returned status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('Hot Cross Bun API error:', error);
@@ -133,13 +101,14 @@ async function sendHotCrossBunMessage(message, chatId = null) {
     }
 }
 
-// Line A API - Updated to support conversation mode and needs
+// Line A API - Uses InsForge meditation-lines function
 async function generateLineA(emotion, sensation, bodySensations = [], thoughts = [], impulses = [], needs = [], conversationMode = true) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/line-a`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/meditation-lines`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
+                action: 'line-a',
                 emotion: emotion,
                 sensation: sensation,
                 bodySensations: bodySensations,
@@ -161,13 +130,14 @@ async function generateLineA(emotion, sensation, bodySensations = [], thoughts =
     }
 }
 
-// Line B API - Updated to support conversation mode and needs
+// Line B API - Uses InsForge meditation-lines function
 async function generateLineB(emotion, sensation, thoughts = [], impulses = [], bodySensations = [], needs = [], conversationMode = true) {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/line-b`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/meditation-lines`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
+                action: 'line-b',
                 emotion: emotion,
                 sensation: sensation,
                 thoughts: thoughts,
@@ -177,11 +147,11 @@ async function generateLineB(emotion, sensation, thoughts = [], impulses = [], b
                 conversationMode: conversationMode
             })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API returned status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('Line B API error:', error);
@@ -189,19 +159,19 @@ async function generateLineB(emotion, sensation, thoughts = [], impulses = [], b
     }
 }
 
-// Text-to-speech API - Existing function
-async function getTextToSpeech(text) {
+// Text-to-speech API - Uses InsForge TTS function
+async function getTextToSpeech(text, voice = 'male') {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/tts`, {
+        const response = await fetch(`${INSFORGE_FUNCTIONS_URL}/tts`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text })
+            body: JSON.stringify({ text, voice })
         });
-        
+
         if (!response.ok) {
             throw new Error(`API returned status: ${response.status}`);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('TTS API error:', error);

@@ -10,7 +10,9 @@ import io
 import time
 
 GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
-ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY") 
+ELEVENLABS_API_KEY = os.environ.get("ELEVENLABS_API_KEY")
+INSFORGE_BASE_URL = os.environ.get("INSFORGE_BASE_URL")
+INSFORGE_ANON_KEY = os.environ.get("INSFORGE_ANON_KEY") 
 
 app = Flask(__name__)
 # Update CORS to allow requests from your web app
@@ -19,6 +21,56 @@ CORS(app, origins="*")
 OLLAMA_BASE = "http://localhost:11434"
 
 conversation_store = {}
+
+# Helper functions for InsForge AI integration
+def gemini_to_openai_messages(gemini_messages):
+    """Convert Gemini message format to OpenAI format"""
+    openai_messages = []
+    for msg in gemini_messages:
+        role = msg.get("role")
+        parts = msg.get("parts", [])
+        text = parts[0].get("text", "") if parts else ""
+
+        # Convert Gemini 'model' role to OpenAI 'assistant' role
+        if role == "model":
+            role = "assistant"
+
+        openai_messages.append({"role": role, "content": text})
+
+    return openai_messages
+
+def openai_to_gemini_format(role, content):
+    """Convert OpenAI message to Gemini format for storage"""
+    gemini_role = "model" if role == "assistant" else role
+    return {"role": gemini_role, "parts": [{"text": content}]}
+
+def call_insforge_ai(messages, model="openai/gpt-4o"):
+    """Call InsForge AI API with OpenAI-compatible format"""
+    url = f"{INSFORGE_BASE_URL}/ai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {INSFORGE_ANON_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": model,
+        "messages": messages
+    }
+
+    response = requests.post(url, json=payload, headers=headers)
+    print(f"[InsForge AI] HTTP status: {response.status_code}")
+
+    if response.status_code != 200:
+        print(f"[InsForge AI] Error response: {response.text}")
+        return None
+
+    try:
+        data = response.json()
+        print(f"[InsForge AI] Response JSON: {data}")
+        return data
+    except Exception as e:
+        print(f"[InsForge AI] Failed to parse JSON: {e}")
+        print(f"[InsForge AI] Raw response: {response.text}")
+        return None
 
 # Load emotion-body map from JSON file
 def load_emotion_body_map():
@@ -304,39 +356,39 @@ The user's current emotion is: {emotion}
 @app.route("/api/mindfulness/start-hcb", methods=["POST"])
 def start_mbct_conversation():
     try:
-
         emotion = request.json.get("emotion", "")
         if not emotion:
             return {"error": "Emotion is required"}, 400
         chat_id = str(uuid.uuid4())
         # Compose system prompt
         system_prompt = get_mbct_system_prompt(emotion)
-        # Start conversation history with system prompt as a user message (Gemini does not support 'system' role)
+
+        # Start conversation history in Gemini format for backward compatibility
         conversation_store[chat_id] = [
             {"role": "user", "parts": [{"text": system_prompt}]},
             {"role": "user", "parts": [{"text": f"My emotion is {emotion}."}]}
         ]
-        # Call Gemini to get the first AI message
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-        payload = {"contents": conversation_store[chat_id]}
-        response = requests.post(url, json=payload)
-        print(f"[Gemini] HTTP status: {response.status_code}")
-        try:
-            data = response.json()
-        except Exception as e:
-            print(f"[Gemini] Failed to parse JSON: {e}")
-            print(f"[Gemini] Raw response: {response.text}")
-            return {"error": "Gemini API did not return valid JSON", "raw": response.text}, 500
-        # Retry once if Gemini returns 503 error
-        if data.get('error', {}).get('code') == 503:
-            print('[Gemini] 503 error on start-hcb, retrying once...', flush=True)
-            response = requests.post(url, json=payload)
-            data = response.json()
-        print(f"[Gemini] Response JSON: {data}")
-        reply = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "(No response)")
+
+        # Convert to OpenAI format for InsForge AI
+        openai_messages = gemini_to_openai_messages(conversation_store[chat_id])
+        # Use system role for the system prompt
+        openai_messages[0]["role"] = "system"
+
+        # Call InsForge AI with gpt-4o
+        data = call_insforge_ai(openai_messages, model="openai/gpt-4o")
+
+        if not data:
+            return {"error": "InsForge AI did not return valid response"}, 500
+
+        # Extract response from OpenAI format
+        reply = data.get("choices", [{}])[0].get("message", {}).get("content", "(No response)")
+
+        # Store response in Gemini format for backward compatibility
         conversation_store[chat_id].append({"role": "model", "parts": [{"text": reply}]})
-        return {"response": reply, "chatId": chat_id, "type": "text", "gemini_raw": data}
+
+        return {"response": reply, "chatId": chat_id, "type": "text", "ai_raw": data}
     except Exception as e:
+        print(f"[Error] start_mbct_conversation: {str(e)}")
         return {"error": str(e)}, 500
 
 
@@ -801,29 +853,31 @@ def mbct_chat():
             return {"error": "No message provided"}, 400
         if not chat_id or chat_id not in conversation_store:
             return {"error": "Invalid chat ID"}, 400
-        # Add user message to conversation history
+
+        # Add user message to conversation history in Gemini format
         conversation_store[chat_id].append({"role": "user", "parts": [{"text": message}]})
-        # Call Gemini with full conversation history
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-        payload = {"contents": conversation_store[chat_id]}
-        response = requests.post(url, json=payload)
-        print(f"[Gemini] HTTP status: {response.status_code}")
-        try:
-            data = response.json()
-        except Exception as e:
-            print(f"[Gemini] Failed to parse JSON: {e}")
-            print(f"[Gemini] Raw response: {response.text}")
-            return {"error": "Gemini API did not return valid JSON", "raw": response.text}, 500
-        # Retry once if Gemini returns 503 error
-        if data.get('error', {}).get('code') == 503:
-            print('[Gemini] 503 error on chat, retrying once...', flush=True)
-            response = requests.post(url, json=payload)
-            data = response.json()
-        print(f"[Gemini] Response JSON: {data}")
-        reply = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "(No response)")
+
+        # Convert to OpenAI format for InsForge AI
+        openai_messages = gemini_to_openai_messages(conversation_store[chat_id])
+        # Use system role for the first message (system prompt)
+        if len(openai_messages) > 0 and openai_messages[0]["role"] == "user":
+            openai_messages[0]["role"] = "system"
+
+        # Call InsForge AI with gpt-4o
+        data = call_insforge_ai(openai_messages, model="openai/gpt-4o")
+
+        if not data:
+            return {"error": "InsForge AI did not return valid response"}, 500
+
+        # Extract response from OpenAI format
+        reply = data.get("choices", [{}])[0].get("message", {}).get("content", "(No response)")
+
+        # Store response in Gemini format for backward compatibility
         conversation_store[chat_id].append({"role": "model", "parts": [{"text": reply}]})
-        return {"response": reply, "chatId": chat_id, "type": "text", "gemini_raw": data}
+
+        return {"response": reply, "chatId": chat_id, "type": "text", "ai_raw": data}
     except Exception as e:
+        print(f"[Error] mbct_chat: {str(e)}")
         return {"error": str(e)}, 500
 
 # NEW ENDPOINT: General chat for direct conversations
@@ -833,43 +887,43 @@ def general_chat():
         # Get message and history
         message = request.json.get("message", "")
         history = request.json.get("history", [])
-        
+
         if not message:
             return {"error": "No message provided"}, 400
-        
-        # Call Gemini API with history + new message
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
-        
-        # Prepare the payload with existing history + new message
+
+        # Prepare the conversation with existing history + new message
         contents = history.copy()
         if not any(msg.get("role") == "user" and msg.get("parts", [{}])[0].get("text") == message for msg in contents):
             contents.append({"role": "user", "parts": [{"text": message}]})
-            
-        payload = {"contents": contents}
-        
-        # Make the API call
-        response = requests.post(url, json=payload)
-        data = response.json()
-        
-        # Extract reply
-        reply = data.get("candidates", [{}])[0].get("content", {}).get("parts", [{}])[0].get("text", "(No response)")
-        
-        # Update history with user message and response
+
+        # Convert to OpenAI format for InsForge AI
+        openai_messages = gemini_to_openai_messages(contents)
+
+        # Call InsForge AI with gpt-4o
+        data = call_insforge_ai(openai_messages, model="openai/gpt-4o")
+
+        if not data:
+            return {"error": "InsForge AI did not return valid response"}, 500
+
+        # Extract reply from OpenAI format
+        reply = data.get("choices", [{}])[0].get("message", {}).get("content", "(No response)")
+
+        # Update history with user message and response in Gemini format
         updated_history = history.copy()
         updated_history.append({"role": "user", "parts": [{"text": message}]})
         updated_history.append({"role": "model", "parts": [{"text": reply}]})
-        
+
         # Limit history length
         if len(updated_history) > 10:
             updated_history = updated_history[-10:]
-            
+
         return {
             "response": reply,
             "history": updated_history,
             "type": "text"  # Plain text conversation, no TTS
         }
     except Exception as e:
-        print(f"General chat error: {str(e)}")
+        print(f"[Error] general_chat: {str(e)}")
         return {"error": str(e)}, 500
 
 @app.route('/')

@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "insforge-zenotal": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@insforge/mcp@latest"
+      ],
+      "env": {
+        "API_KEY": "ik_1cde5c2a3acbf510a6c308ad465b088b",
+        "API_BASE_URL": "https://dku2r8qi.us-east.insforge.app"
+      }
+    }
+  }
+}
