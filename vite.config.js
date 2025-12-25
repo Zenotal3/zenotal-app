@@ -7,8 +7,9 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
+        // Only copy non-module JS files (exclude files that use import/export)
         {
-          src: 'js/**/*',
+          src: 'js/**/!(clerk-auth|insforge).js',
           dest: 'js'
         },
         {
@@ -29,5 +30,9 @@ export default defineConfig({
         sharing: './sharing.html'
       }
     }
+  },
+  // Ensure node_modules are resolved properly
+  resolve: {
+    preserveSymlinks: true
   }
 })

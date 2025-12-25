@@ -1252,23 +1252,9 @@ Now let's move into a guided meditation practice.`;
 
     // Check if Flask server is running
     async function checkServerConnectivity() {
-        try {
-            console.log('[DEBUG] Checking server connectivity...');
-            const response = await fetch(`${API_BASE_URL}/api/test`, {
-                method: 'GET',
-                timeout: 5000 // 5 second timeout
-            });
-            
-            if (response.ok) {
-                console.log('✅ Server is running and accessible');
-            } else {
-                console.warn('⚠️ Server responded but with error status:', response.status);
-                showServerWarning();
-            }
-        } catch (error) {
-            console.error('❌ Server connectivity check failed:', error);
-            showServerWarning();
-        }
+        // InsForge edge functions don't need connectivity check
+        console.log('[DEBUG] Using InsForge Edge Functions - no connectivity check needed');
+        console.log('✅ InsForge Edge Functions ready');
     }
     
     function showServerWarning() {
