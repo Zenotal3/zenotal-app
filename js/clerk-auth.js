@@ -7,11 +7,20 @@ if (!clerkPubKey) {
   console.error('Missing Clerk Publishable Key. Please add VITE_CLERK_PUBLISHABLE_KEY to your .env file');
 }
 
-const clerk = new Clerk(clerkPubKey);
-await clerk.load();
+// Initialize clerk with async IIFE to avoid top-level await
+(async () => {
+  const clerk = new Clerk(clerkPubKey);
+  await clerk.load();
 
-// Make clerk available globally for other scripts
-window.clerk = clerk;
+  // Make clerk available globally for other scripts
+  window.clerk = clerk;
+
+  // Update UI after clerk is loaded
+  updateAuthUI();
+
+  // Set up auth state listener
+  setupAuthListener();
+})();
 
 // Update UI based on authentication state
 function updateAuthUI() {
@@ -48,13 +57,13 @@ function updateAuthUI() {
 
 // Set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
-  updateAuthUI();
-
   // Sign In button
   const signInBtn = document.getElementById('clerk-sign-in');
   if (signInBtn) {
     signInBtn.addEventListener('click', () => {
-      clerk.openSignIn();
+      if (window.clerk) {
+        window.clerk.openSignIn();
+      }
     });
   }
 
@@ -62,27 +71,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const signUpBtn = document.getElementById('clerk-sign-up');
   if (signUpBtn) {
     signUpBtn.addEventListener('click', () => {
-      clerk.openSignUp();
+      if (window.clerk) {
+        window.clerk.openSignUp();
+      }
     });
   }
 });
 
-// Listen for auth state changes
-clerk.addListener((resources) => {
-  updateAuthUI();
+// Set up auth state listener after clerk is loaded
+function setupAuthListener() {
+  if (window.clerk) {
+    window.clerk.addListener((resources) => {
+      updateAuthUI();
 
-  // If user just signed in and was trying to access protected content, continue navigation
-  if (resources.user && sessionStorage.getItem('pendingNavigation')) {
-    const destination = sessionStorage.getItem('pendingNavigation');
-    sessionStorage.removeItem('pendingNavigation');
+      // If user just signed in and was trying to access protected content, continue navigation
+      if (resources.user && sessionStorage.getItem('pendingNavigation')) {
+        const destination = sessionStorage.getItem('pendingNavigation');
+        sessionStorage.removeItem('pendingNavigation');
 
-    // Small delay to ensure everything is loaded
-    setTimeout(() => {
-      if (window.navigateTo && destination) {
-        window.navigateTo(destination);
+        // Small delay to ensure everything is loaded
+        setTimeout(() => {
+          if (window.navigateTo && destination) {
+            window.navigateTo(destination);
+          }
+        }, 500);
       }
-    }, 500);
+    });
   }
-});
-
-export { clerk };
+}
