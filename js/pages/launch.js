@@ -3,12 +3,42 @@ document.addEventListener('DOMContentLoaded', () => {
     initGradientMesh();
     
     const beginResetBtn = document.getElementById('beginResetBtn');
-    
+
     if (beginResetBtn) {
-        beginResetBtn.addEventListener('click', () => {
-            console.log('🔘 Button clicked! Navigating to emotion wheel...');
-            // Navigate to the emotion wheel instead of directly to the app
-            window.navigateTo('emotion-wheel');
+        beginResetBtn.addEventListener('click', async () => {
+            console.log('🔘 Button clicked!');
+
+            // Wait for Clerk to be ready if it's not loaded yet
+            let clerk = window.clerk;
+            if (!clerk) {
+                console.log('⏳ Waiting for Clerk to load...');
+                // Wait up to 5 seconds for Clerk to load
+                for (let i = 0; i < 50; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    if (window.clerk) {
+                        clerk = window.clerk;
+                        break;
+                    }
+                }
+            }
+
+            // Check if Clerk is loaded and user is authenticated
+            if (clerk && clerk.user) {
+                console.log('✅ User is authenticated. Navigating to emotion wheel...');
+                window.navigateTo('emotion-wheel');
+            } else if (clerk) {
+                console.log('🔒 User not authenticated. Opening sign-in...');
+                // Store intended destination for after sign-in
+                sessionStorage.setItem('pendingNavigation', 'emotion-wheel');
+                // Open Clerk sign-in modal
+                clerk.openSignIn({
+                    afterSignInUrl: window.location.href,
+                    afterSignUpUrl: window.location.href
+                });
+            } else {
+                console.error('❌ Clerk failed to load');
+                alert('Authentication system could not be loaded. Please refresh the page and try again.');
+            }
         });
     } else {
         console.log('❌ Button not found!');

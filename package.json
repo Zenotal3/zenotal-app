@@ -10,5 +10,8 @@
   },
   "devDependencies": {
     "vite": "^6.0.3"
+  },
+  "dependencies": {
+    "@clerk/clerk-js": "^5.117.0"
   }
 }

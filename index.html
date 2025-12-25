@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/pages/launch.css">
     <link rel="stylesheet" href="css/pages/emotion-wheel.css">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -25,10 +26,18 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
+<script type="module" src="/js/clerk-auth.js"></script>
 
 </head>
 
 <body>
+    <!-- Authentication Header -->
+    <div class="auth-header">
+        <button id="clerk-sign-in" class="auth-btn">Sign In</button>
+        <button id="clerk-sign-up" class="auth-btn">Sign Up</button>
+        <div id="clerk-user-button"></div>
+    </div>
+
     <!-- Launch Page -->
     <div id="launchPage" class="launch-container">
         <canvas id="gradientMesh" class="gradient-mesh"></canvas>
