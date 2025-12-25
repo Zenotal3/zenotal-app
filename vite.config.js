@@ -22,7 +22,11 @@ export default defineConfig({
     outDir: 'dist',
     rollupOptions: {
       input: {
-        main: './index.html'
+        main: './index.html',
+        conversation: './conversation.html',
+        app: './app.html',
+        audio: './audio.html',
+        sharing: './sharing.html'
       }
     }
   }
