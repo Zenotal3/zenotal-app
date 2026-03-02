@@ -8,10 +8,12 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         // Copy non-module JS files (exclude files that use import/export)
+        // Flatten all into dist/js/ (HTML references like js/app.js, js/launch.js)
         {
-          src: 'js/!(clerk-auth|insforge).js',
+          src: 'js/**/!(clerk-auth|insforge).js',
           dest: 'js'
         },
+        // Also preserve js/pages/ structure (for js/pages/dashboard.js, js/pages/sharing.js)
         {
           src: 'js/pages/*.js',
           dest: 'js/pages'
