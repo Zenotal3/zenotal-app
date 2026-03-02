@@ -155,10 +155,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return `${day}.${month}.${year}`;
     }
 
-    function joinArray(arr) {
-        if (Array.isArray(arr) && arr.length > 0) {
-            return arr.join(', ');
-        }
+    function firstItem(val) {
+        if (Array.isArray(val) && val.length > 0) return val[0];
+        if (typeof val === 'string' && val) return val;
         return '';
     }
 
@@ -184,10 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (session) {
                 if (dateEl) dateEl.textContent = formatDate(session.created_at);
                 if (feelingsEl) feelingsEl.textContent = session.emotion || '';
-                if (sensationsEl) sensationsEl.textContent = joinArray(session.body_sensations);
-                if (thoughtsEl) thoughtsEl.textContent = joinArray(session.thoughts);
-                if (impulsesEl) impulsesEl.textContent = joinArray(session.impulses);
-                if (needEl) needEl.textContent = joinArray(session.needs);
+                if (sensationsEl) sensationsEl.textContent = firstItem(session.body_sensations);
+                if (thoughtsEl) thoughtsEl.textContent = firstItem(session.thoughts);
+                if (impulsesEl) impulsesEl.textContent = firstItem(session.impulses);
+                if (needEl) needEl.textContent = firstItem(session.needs);
             } else {
                 if (dateEl) dateEl.textContent = '';
                 if (feelingsEl) feelingsEl.textContent = '';

@@ -1061,7 +1061,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
     }
 
+    var sessionSaved = false;
     function showSessionComplete() {
+        if (sessionSaved) return;
+        sessionSaved = true;
         // Check if sessionComplete element exists (it might have been removed)
         if (sessionComplete) {
             sessionComplete.classList.add('visible');
@@ -1071,31 +1074,98 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('lastSessionCompleted', now);
         localStorage.setItem('sessionCompletedEmotion', userEmotion || 'neutral');
 
-        // Save session to InsForge database
+        // Generate AI summary and save session to database, then redirect
         const userId = localStorage.getItem('clerkUserId');
         if (userId) {
-            saveSessionToDb({
-                user_id: userId,
-                emotion: userEmotion || 'neutral',
-                stress_level: parseInt(localStorage.getItem('userStressScale') || '0', 10),
-                character_name: (localStorage.getItem('selectedCharacterName') || localStorage.getItem('selectedCharacter') || '').replace(/^\w/, c => c.toUpperCase()) || null,
-                voice: localStorage.getItem('selectedVoice') || null,
-                conversation_mode: localStorage.getItem('conversationChoice') === 'yes',
-                body_sensations: JSON.parse(localStorage.getItem('bodySensations') || '[]'),
-                thoughts: JSON.parse(localStorage.getItem('userThoughts') || '[]'),
-                impulses: JSON.parse(localStorage.getItem('userImpulses') || '[]'),
-                needs: JSON.parse(localStorage.getItem('userNeed') || '[]'),
-                line_a: localStorage.getItem('lineA') || null,
-                line_b: localStorage.getItem('lineB') || null
-            });
+            generateAndSaveSession(userId);
         } else {
             console.warn('No user ID found — session not saved to database');
+            setTimeout(() => { window.location.href = 'sharing.html'; }, 3000);
+        }
+    }
+
+    async function generateAndSaveSession(userId) {
+        const emotion = userEmotion || 'neutral';
+        const chatHistory = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+        const conversationChoice = localStorage.getItem('conversationChoice');
+
+        // Collect all available user context for the AI
+        let contextParts = ['Emotion: ' + emotion];
+        if (localStorage.getItem('userStressScale')) {
+            contextParts.push('Stress level: ' + localStorage.getItem('userStressScale') + '/5');
+        }
+        if (conversationChoice === 'yes' && chatHistory.length > 0) {
+            // Extract user messages from conversation as context
+            const userMessages = chatHistory
+                .filter(function(m) { return m.sender === 'user'; })
+                .map(function(m) { return m.message; })
+                .join('. ');
+            if (userMessages) contextParts.push('User said: ' + userMessages.substring(0, 500));
         }
 
-        // Automatically redirect to sharing page after 3 seconds
-        setTimeout(() => {
-            window.location.href = 'sharing.html';
-        }, 3000);
+        // Default values from localStorage (may be empty)
+        var sessionRecord = {
+            body_sensations: '',
+            thoughts: '',
+            impulses: '',
+            needs: ''
+        };
+
+        // Call AI to generate one word per dimension
+        try {
+            var aiResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'openai/gpt-4o-mini',
+                    messages: [{
+                        role: 'system',
+                        content: 'You are a mindfulness therapist. Based on user session data, produce exactly ONE word for each of 5 dimensions. Return ONLY valid JSON: {"feeling":"word","body_sensation":"word","thought":"word","impulse":"word","need":"word"}'
+                    }, {
+                        role: 'user',
+                        content: contextParts.join('. ') + '. Summarize this session into exactly one word per dimension. Examples: feeling=anxious, body_sensation=tightness, thought=failure, impulse=withdraw, need=safety. ONE word each, lowercase.'
+                    }]
+                })
+            });
+            if (aiResponse.ok) {
+                var aiData = await aiResponse.json();
+                var text = aiData.text || (aiData.choices && aiData.choices[0] && aiData.choices[0].message && aiData.choices[0].message.content) || '';
+                var jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    var insights = JSON.parse(jsonMatch[0]);
+                    console.log('AI session summary:', insights);
+                    if (insights.feeling) sessionRecord.feeling = insights.feeling;
+                    if (insights.body_sensation) sessionRecord.body_sensations = insights.body_sensation;
+                    if (insights.thought) sessionRecord.thoughts = insights.thought;
+                    if (insights.impulse) sessionRecord.impulses = insights.impulse;
+                    if (insights.need) sessionRecord.needs = insights.need;
+                }
+            }
+        } catch (e) {
+            console.warn('AI summary failed, saving with emotion only:', e);
+        }
+
+        // Save to database — store single words as single-element arrays (jsonb columns)
+        saveSessionToDb({
+            user_id: userId,
+            emotion: sessionRecord.feeling || emotion,
+            stress_level: parseInt(localStorage.getItem('userStressScale') || '0', 10),
+            character_name: (localStorage.getItem('selectedCharacterName') || localStorage.getItem('selectedCharacter') || '').replace(/^\w/, function(c) { return c.toUpperCase(); }) || null,
+            voice: localStorage.getItem('selectedVoice') || null,
+            conversation_mode: conversationChoice === 'yes',
+            body_sensations: sessionRecord.body_sensations ? [sessionRecord.body_sensations] : [],
+            thoughts: sessionRecord.thoughts ? [sessionRecord.thoughts] : [],
+            impulses: sessionRecord.impulses ? [sessionRecord.impulses] : [],
+            needs: sessionRecord.needs ? [sessionRecord.needs] : [],
+            line_a: localStorage.getItem('lineA') || null,
+            line_b: localStorage.getItem('lineB') || null
+        });
+
+        // Redirect to sharing page after 3 seconds
+        setTimeout(function() { window.location.href = 'sharing.html'; }, 3000);
     }
 
     function showAudioError() {
