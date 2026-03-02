@@ -163,10 +163,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function populateJournalColumns(sessions) {
         // sessions is an array of up to 3, oldest first.
-        // Pad from the left so the most recent is in the rightmost column.
+        // Fill from left: 1 session = col 1, 2 sessions = col 1+2, 3 = all.
         const columns = [null, null, null];
         for (let i = 0; i < sessions.length; i++) {
-            columns[3 - sessions.length + i] = sessions[i];
+            columns[i] = sessions[i];
         }
 
         for (let col = 0; col < 3; col++) {
