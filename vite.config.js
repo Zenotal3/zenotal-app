@@ -18,6 +18,11 @@ export default defineConfig({
           src: 'js/pages/*.js',
           dest: 'js/pages'
         },
+        // Copy JSON data files in js/
+        {
+          src: 'js/*.json',
+          dest: 'js'
+        },
         {
           src: 'css/**/*',
           dest: 'css'
