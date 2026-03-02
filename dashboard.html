@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zenotal - Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/reset.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/pages/dashboard.css">
+    <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+    <!-- Auth Guard: Not Logged In -->
+    <div id="authGuard" class="dashboard-auth-guard">
+        <div class="auth-guard-content">
+            <h1>Welcome to your Dashboard</h1>
+            <p>Sign in to view your session history, trends, and insights.</p>
+            <a href="index.html" class="auth-guard-btn">Go to Sign In</a>
+        </div>
+    </div>
+
+    <!-- Dashboard: Logged In -->
+    <div id="dashboardMain" class="dashboard-container" style="display:none;">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <a href="index.html" class="dashboard-back" title="Back to home">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Home
+            </a>
+            <h1>My Journey</h1>
+        </header>
+
+        <!-- Loading State -->
+        <div id="dashboardLoading" class="dashboard-loading">
+            <p>Loading your sessions...</p>
+        </div>
+
+        <!-- Empty State -->
+        <div id="dashboardEmpty" class="dashboard-empty" style="display:none;">
+            <h2>No sessions yet</h2>
+            <p>Complete your first reset to start seeing insights here.</p>
+            <a href="index.html" class="dashboard-btn">Start a Reset</a>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" style="display:none;">
+            <!-- Summary Cards -->
+            <section class="summary-cards">
+                <div class="summary-card">
+                    <span class="summary-label">Total Sessions</span>
+                    <span class="summary-value" id="totalSessions">0</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Most Frequent Emotion</span>
+                    <span class="summary-value" id="topEmotion">--</span>
+                </div>
+                <div class="summary-card">
+                    <span class="summary-label">Average Stress</span>
+                    <span class="summary-value" id="avgStress">--</span>
+                </div>
+            </section>
+
+            <!-- Last Session -->
+            <section class="last-session-card">
+                <h2>Last Session</h2>
+                <div class="last-session-details">
+                    <div class="detail-row"><span class="detail-label">Date</span><span id="lastDate">--</span></div>
+                    <div class="detail-row"><span class="detail-label">Emotion</span><span id="lastEmotion">--</span></div>
+                    <div class="detail-row"><span class="detail-label">Body Sensation</span><span id="lastBody">--</span></div>
+                    <div class="detail-row"><span class="detail-label">Thought</span><span id="lastThought">--</span></div>
+                    <div class="detail-row"><span class="detail-label">Impulse</span><span id="lastImpulse">--</span></div>
+                    <div class="detail-row"><span class="detail-label">Need</span><span id="lastNeed">--</span></div>
+                </div>
+                <a href="index.html" class="dashboard-btn">Start New Reset</a>
+            </section>
+
+            <!-- Charts Row -->
+            <section class="charts-row">
+                <!-- Emotion Trend -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h2>Emotion Trend</h2>
+                        <div class="chart-toggle">
+                            <button class="toggle-btn active" data-days="7">7 days</button>
+                            <button class="toggle-btn" data-days="30">30 days</button>
+                        </div>
+                    </div>
+                    <canvas id="emotionChart"></canvas>
+                </div>
+
+                <!-- Stress Distribution -->
+                <div class="chart-card">
+                    <h2>Stress Distribution</h2>
+                    <canvas id="stressChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Keyword Cloud -->
+            <section class="keyword-cloud-card">
+                <h2>Keyword Cloud</h2>
+                <div id="keywordCloud" class="keyword-cloud"></div>
+            </section>
+
+            <!-- Session History Table -->
+            <section class="history-card">
+                <h2>Session History</h2>
+                <div class="table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Emotion</th>
+                                <th>Stress</th>
+                                <th>Body Sensation</th>
+                                <th>Thought</th>
+                                <th>Impulse</th>
+                                <th>Need</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script src="js/db.js"></script>
+    <script src="js/pages/dashboard.js"></script>
+</body>
+</html>

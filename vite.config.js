@@ -31,7 +31,8 @@ export default defineConfig({
         conversation: './conversation.html',
         app: './app.html',
         audio: './audio.html',
-        sharing: './sharing.html'
+        sharing: './sharing.html',
+        dashboard: './dashboard.html'
       }
     }
   },

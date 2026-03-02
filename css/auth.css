@@ -42,6 +42,19 @@
     background: #2A2A2A;
 }
 
+/* Dashboard Link */
+.dashboard-link {
+    text-decoration: none;
+    background: transparent;
+    color: #0F0F0F;
+    border: 1px solid rgba(15, 15, 15, 0.2);
+}
+
+.dashboard-link:hover {
+    background: rgba(15, 15, 15, 0.05);
+    border-color: rgba(15, 15, 15, 0.3);
+}
+
 /* User Button */
 #clerk-user-button {
     display: none;

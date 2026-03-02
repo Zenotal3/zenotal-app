@@ -27,6 +27,7 @@ function updateAuthUI() {
   const signInBtn = document.getElementById('clerk-sign-in');
   const signUpBtn = document.getElementById('clerk-sign-up');
   const userBtnContainer = document.getElementById('clerk-user-button');
+  const dashboardLink = document.getElementById('dashboard-link');
 
   if (clerk.user) {
     // Persist user ID for use on pages without Clerk
@@ -34,6 +35,7 @@ function updateAuthUI() {
     // User is signed in
     if (signInBtn) signInBtn.style.display = 'none';
     if (signUpBtn) signUpBtn.style.display = 'none';
+    if (dashboardLink) dashboardLink.style.display = 'inline-block';
     if (userBtnContainer) {
       userBtnContainer.style.display = 'flex';
       // Mount Clerk's UserButton component
@@ -51,6 +53,7 @@ function updateAuthUI() {
     localStorage.removeItem('clerkUserId');
     if (signInBtn) signInBtn.style.display = 'block';
     if (signUpBtn) signUpBtn.style.display = 'block';
+    if (dashboardLink) dashboardLink.style.display = 'none';
     if (userBtnContainer) {
       userBtnContainer.style.display = 'none';
       userBtnContainer.innerHTML = ''; // Clear the mounted component
