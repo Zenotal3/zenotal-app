@@ -44,9 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Set the appropriate completion message
         setCompletionMessage(sessionCompletedEmotion);
         
-        // Initialize the current date immediately
-        initializeCurrentDate();
-        
         // Add click listener for card flip and close button
         setupCardInteraction();
         
@@ -66,20 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => {
             sharingContainer.classList.remove('loading');
         }, 500);
-    }
-
-    function initializeCurrentDate() {
-        // Set the actual current system date immediately on page load
-        const dateElement = document.querySelector('.session-date');
-        if (dateElement) {
-            const today = new Date();
-            const day = today.getDate().toString().padStart(2, '0');
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const year = today.getFullYear();
-            const formattedDate = `${day}.${month}.${year}`;
-            dateElement.textContent = formattedDate;
-            console.log('System date initialized to:', formattedDate);
-        }
     }
 
     function setCompletionMessage(emotion) {
@@ -164,127 +147,69 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionCard.style.transform = '';
     }
 
-    function setupBackSideContent() {
+    function formatDate(isoString) {
+        const d = new Date(isoString);
+        const day = d.getDate().toString().padStart(2, '0');
+        const month = (d.getMonth() + 1).toString().padStart(2, '0');
+        const year = d.getFullYear().toString().slice(-2);
+        return `${day}.${month}.${year}`;
+    }
+
+    function joinArray(arr) {
+        if (Array.isArray(arr) && arr.length > 0) {
+            return arr.join(', ');
+        }
+        return '';
+    }
+
+    function populateJournalColumns(sessions) {
+        // sessions is an array of up to 3, oldest first.
+        // Pad from the left so the most recent is in the rightmost column.
+        const columns = [null, null, null];
+        for (let i = 0; i < sessions.length; i++) {
+            columns[3 - sessions.length + i] = sessions[i];
+        }
+
+        for (let col = 0; col < 3; col++) {
+            const colNum = col + 1;
+            const session = columns[col];
+
+            const dateEl = document.getElementById('journalDate' + colNum);
+            const feelingsEl = document.getElementById('feelingsText' + colNum);
+            const sensationsEl = document.getElementById('sensationsText' + colNum);
+            const thoughtsEl = document.getElementById('thoughtsText' + colNum);
+            const impulsesEl = document.getElementById('impulsesText' + colNum);
+            const needEl = document.getElementById('needText' + colNum);
+
+            if (session) {
+                if (dateEl) dateEl.textContent = formatDate(session.created_at);
+                if (feelingsEl) feelingsEl.textContent = session.emotion || '';
+                if (sensationsEl) sensationsEl.textContent = joinArray(session.body_sensations);
+                if (thoughtsEl) thoughtsEl.textContent = joinArray(session.thoughts);
+                if (impulsesEl) impulsesEl.textContent = joinArray(session.impulses);
+                if (needEl) needEl.textContent = joinArray(session.needs);
+            } else {
+                if (dateEl) dateEl.textContent = '';
+                if (feelingsEl) feelingsEl.textContent = '';
+                if (sensationsEl) sensationsEl.textContent = '';
+                if (thoughtsEl) thoughtsEl.textContent = '';
+                if (impulsesEl) impulsesEl.textContent = '';
+                if (needEl) needEl.textContent = '';
+            }
+        }
+    }
+
+    async function setupBackSideContent() {
         console.log('Setting up back side content');
-        
-        // Get session data
-        const sessionData = getSessionData();
-        
-        // Update date to current system date (not session date)
-        const dateElement = document.querySelector('.session-date');
-        if (dateElement) {
-            const today = new Date(); // Always use current system date
-            // Format as DD.MM.YYYY
-            const day = today.getDate().toString().padStart(2, '0');
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const year = today.getFullYear();
-            const formattedDate = `${day}.${month}.${year}`;
-            dateElement.textContent = formattedDate;
-            console.log('Back side date set to current system date:', formattedDate);
+
+        const userId = localStorage.getItem('clerkUserId');
+        if (userId) {
+            const sessions = await fetchRecentSessions(userId, 3);
+            populateJournalColumns(sessions);
+        } else {
+            console.warn('No authenticated user — cannot fetch session history');
+            populateJournalColumns([]);
         }
-
-        // Update conversation insights
-        updateConversationInsights(sessionData);
-    }
-
-    function getSessionData() {
-        // Debug: check what's actually in localStorage
-        console.log('=== DEBUGGING LOCALSTORAGE ===');
-        for (let key in localStorage) {
-            if (localStorage.hasOwnProperty(key)) {
-                console.log(`${key}: ${localStorage.getItem(key)}`);
-            }
-        }
-        console.log('===============================');
-        
-        return {
-            emotion: localStorage.getItem('sessionCompletedEmotion') || localStorage.getItem('userEmotion') || 'neutral',
-            completedAt: localStorage.getItem('lastSessionCompleted'),
-            chatHistory: JSON.parse(localStorage.getItem('chatHistory') || '[]'),
-            stressLevel: localStorage.getItem('userStressScale'),
-            conversationChoice: localStorage.getItem('conversationChoice'),
-            // Get the extracted HCB data - try different possible key names
-            bodySensations: JSON.parse(localStorage.getItem('bodySensations') || localStorage.getItem('extractedBodySensations') || '[]'),
-            userThoughts: JSON.parse(localStorage.getItem('userThoughts') || localStorage.getItem('extractedThoughts') || '[]'),
-            userImpulses: JSON.parse(localStorage.getItem('userImpulses') || localStorage.getItem('extractedImpulses') || '[]'),
-            userNeed: JSON.parse(localStorage.getItem('userNeed') || localStorage.getItem('extractedNeed') || '[]')
-        };
-    }
-
-    function updateConversationInsights(sessionData) {
-        console.log('🎴 SHARING CARD - PROCESSING INSIGHTS');
-        console.log('📥 Input sessionData:', sessionData);
-        console.log('🔍 Checking individual data fields:');
-        console.log('  - emotion:', sessionData.emotion);
-        console.log('  - bodySensations:', sessionData.bodySensations);
-        console.log('  - userThoughts:', sessionData.userThoughts);
-        console.log('  - userImpulses:', sessionData.userImpulses);
-        console.log('  - userNeed:', sessionData.userNeed);
-        
-        // Use the actual extracted data from HCB conversation
-        const insights = {
-            feelings: sessionData.emotion || 'Not specified',
-            sensations: Array.isArray(sessionData.bodySensations) && sessionData.bodySensations.length > 0 
-                ? sessionData.bodySensations.join(' • ') 
-                : 'Body awareness noted',
-            thoughts: Array.isArray(sessionData.userThoughts) && sessionData.userThoughts.length > 0 
-                ? sessionData.userThoughts.join(' • ') 
-                : 'Mental patterns observed',
-            impulses: Array.isArray(sessionData.userImpulses) && sessionData.userImpulses.length > 0 
-                ? sessionData.userImpulses.join(' • ') 
-                : 'Behavioral tendencies noticed',
-            needs: Array.isArray(sessionData.userNeed) && sessionData.userNeed.length > 0 
-                ? sessionData.userNeed.join(' • ') 
-                : 'Personal needs identified'
-        };
-
-        console.log('✨ GENERATED INSIGHTS FOR CARD:', insights);
-        
-        // Update each category
-        const categories = ['feelings', 'sensations', 'thoughts', 'impulses', 'needs'];
-        categories.forEach(category => {
-            const element = document.querySelector(`.insight-${category} .insight-text`);
-            if (element && insights[category]) {
-                element.textContent = insights[category];
-                console.log(`Updated ${category}: ${insights[category]}`);
-            }
-        });
-    }
-
-    function extractInsightsFromChat(chatHistory) {
-        // This is a simplified extraction - in a real app you'd use NLP or structured data
-        const insights = {
-            feelings: "Processed emotions during meditation",
-            sensations: "Body awareness and physical responses",
-            thoughts: "Mental patterns and reflections",
-            impulses: "Behavioral tendencies observed",
-            needs: "Personal requirements identified"
-        };
-
-        // If we have actual chat data, try to extract real insights
-        if (chatHistory && chatHistory.length > 0) {
-            // Look for user messages that might contain insights
-            const userMessages = chatHistory.filter(msg => msg.sender === 'user');
-            
-            if (userMessages.length > 0) {
-                // Simple keyword-based extraction
-                const allText = userMessages.map(msg => msg.message).join(' ').toLowerCase();
-                
-                if (allText.includes('feel') || allText.includes('emotion')) {
-                    insights.feelings = userMessages[0].message.substring(0, 50) + '...';
-                }
-                
-                if (allText.includes('body') || allText.includes('physical')) {
-                    insights.sensations = "Physical awareness during session";
-                }
-                
-                if (allText.includes('think') || allText.includes('thought')) {
-                    insights.thoughts = "Mental observations from meditation";
-                }
-            }
-        }
-
-        return insights;
     }
 
     // Future function for navigating to next step

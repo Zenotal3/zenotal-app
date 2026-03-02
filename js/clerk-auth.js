@@ -29,6 +29,8 @@ function updateAuthUI() {
   const userBtnContainer = document.getElementById('clerk-user-button');
 
   if (clerk.user) {
+    // Persist user ID for use on pages without Clerk
+    localStorage.setItem('clerkUserId', clerk.user.id);
     // User is signed in
     if (signInBtn) signInBtn.style.display = 'none';
     if (signUpBtn) signUpBtn.style.display = 'none';
@@ -46,6 +48,7 @@ function updateAuthUI() {
     }
   } else {
     // User is signed out
+    localStorage.removeItem('clerkUserId');
     if (signInBtn) signInBtn.style.display = 'block';
     if (signUpBtn) signUpBtn.style.display = 'block';
     if (userBtnContainer) {

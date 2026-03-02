@@ -1067,9 +1067,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             sessionComplete.classList.add('visible');
         }
         
-        localStorage.setItem('lastSessionCompleted', new Date().toISOString());
+        const now = new Date().toISOString();
+        localStorage.setItem('lastSessionCompleted', now);
         localStorage.setItem('sessionCompletedEmotion', userEmotion || 'neutral');
-        
+
+        // Save session to InsForge database
+        const userId = localStorage.getItem('clerkUserId');
+        if (userId) {
+            saveSessionToDb({
+                user_id: userId,
+                emotion: userEmotion || 'neutral',
+                stress_level: parseInt(localStorage.getItem('userStressScale') || '0', 10),
+                character_name: (localStorage.getItem('selectedCharacterName') || localStorage.getItem('selectedCharacter') || '').replace(/^\w/, c => c.toUpperCase()) || null,
+                voice: localStorage.getItem('selectedVoice') || null,
+                conversation_mode: localStorage.getItem('conversationChoice') === 'yes',
+                body_sensations: JSON.parse(localStorage.getItem('bodySensations') || '[]'),
+                thoughts: JSON.parse(localStorage.getItem('userThoughts') || '[]'),
+                impulses: JSON.parse(localStorage.getItem('userImpulses') || '[]'),
+                needs: JSON.parse(localStorage.getItem('userNeed') || '[]'),
+                line_a: localStorage.getItem('lineA') || null,
+                line_b: localStorage.getItem('lineB') || null
+            });
+        } else {
+            console.warn('No user ID found — session not saved to database');
+        }
+
         // Automatically redirect to sharing page after 3 seconds
         setTimeout(() => {
             window.location.href = 'sharing.html';
