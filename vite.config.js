@@ -7,10 +7,14 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [
-        // Only copy non-module JS files (exclude files that use import/export)
+        // Copy non-module JS files (exclude files that use import/export)
         {
-          src: 'js/**/!(clerk-auth|insforge).js',
+          src: 'js/!(clerk-auth|insforge).js',
           dest: 'js'
+        },
+        {
+          src: 'js/pages/*.js',
+          dest: 'js/pages'
         },
         {
           src: 'css/**/*',
