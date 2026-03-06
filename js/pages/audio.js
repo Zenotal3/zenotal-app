@@ -1148,18 +1148,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.warn('AI summary failed, saving with emotion only:', e);
         }
 
-        // Save to database — store single words as single-element arrays (jsonb columns)
+        // Read rich extracted data from conversation (set by app.js during HCB flow)
+        var extractedBodySensations = JSON.parse(localStorage.getItem('bodySensations') || '[]');
+        var extractedThoughts = JSON.parse(localStorage.getItem('userThoughts') || '[]');
+        var extractedImpulses = JSON.parse(localStorage.getItem('userImpulses') || '[]');
+        var extractedNeeds = JSON.parse(localStorage.getItem('userNeed') || '[]');
+        var selectedStressLevel = localStorage.getItem('userStressScale') || localStorage.getItem('stressLevel') || '0';
+
+        // Save to database — prefer rich extracted phrases, fall back to AI one-word summaries
         saveSessionToDb({
             user_id: userId,
             emotion: sessionRecord.feeling || emotion,
-            stress_level: parseInt(localStorage.getItem('userStressScale') || '0', 10),
+            stress_level: parseInt(selectedStressLevel, 10),
             character_name: (localStorage.getItem('selectedCharacterName') || localStorage.getItem('selectedCharacter') || '').replace(/^\w/, function(c) { return c.toUpperCase(); }) || null,
             voice: localStorage.getItem('selectedVoice') || null,
             conversation_mode: conversationChoice === 'yes',
-            body_sensations: sessionRecord.body_sensations ? [sessionRecord.body_sensations] : [],
-            thoughts: sessionRecord.thoughts ? [sessionRecord.thoughts] : [],
-            impulses: sessionRecord.impulses ? [sessionRecord.impulses] : [],
-            needs: sessionRecord.needs ? [sessionRecord.needs] : [],
+            body_sensations: extractedBodySensations.length > 0 ? extractedBodySensations : (sessionRecord.body_sensations ? [sessionRecord.body_sensations] : []),
+            thoughts: extractedThoughts.length > 0 ? extractedThoughts : (sessionRecord.thoughts ? [sessionRecord.thoughts] : []),
+            impulses: extractedImpulses.length > 0 ? extractedImpulses : (sessionRecord.impulses ? [sessionRecord.impulses] : []),
+            needs: extractedNeeds.length > 0 ? extractedNeeds : (sessionRecord.needs ? [sessionRecord.needs] : []),
             line_a: localStorage.getItem('lineA') || null,
             line_b: localStorage.getItem('lineB') || null
         });
