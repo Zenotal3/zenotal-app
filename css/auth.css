@@ -73,6 +73,29 @@
     white-space: nowrap;
 }
 
+/* Initial Avatar */
+.auth-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #E68872;
+    color: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.auth-avatar:hover {
+    transform: scale(1.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
 .auth-btn-signout {
     background: transparent;
     color: #0F0F0F;

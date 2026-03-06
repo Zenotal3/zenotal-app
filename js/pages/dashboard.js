@@ -62,6 +62,7 @@
         renderKeywordCloud();
         renderSessionCards();
         setupToggle();
+        setupAccount();
     }
 
     // --- Summary Cards ---
@@ -409,6 +410,47 @@
                 renderEmotionChart(Number(btn.getAttribute('data-days')));
             });
         });
+    }
+
+    // --- Account & Sign Out ---
+    function setupAccount() {
+        var emailEl = document.getElementById('dashboardEmail');
+        var signOutBtn = document.getElementById('dashboardSignOut');
+
+        // Try to get user info from auth module (loaded async as ES module)
+        function populateEmail() {
+            if (typeof window.getCurrentUser === 'function') {
+                var user = window.getCurrentUser();
+                if (user && emailEl) {
+                    emailEl.textContent = user.email || '';
+                }
+            }
+        }
+
+        // Auth module loads async; retry briefly
+        populateEmail();
+        if (!emailEl.textContent) {
+            var attempts = 0;
+            var interval = setInterval(function () {
+                populateEmail();
+                attempts++;
+                if (emailEl.textContent || attempts > 20) clearInterval(interval);
+            }, 200);
+        }
+
+        if (signOutBtn) {
+            signOutBtn.addEventListener('click', function () {
+                if (typeof window.handleSignOut === 'function') {
+                    window.handleSignOut().then(function () {
+                        window.location.href = 'index.html';
+                    });
+                } else {
+                    // Fallback: clear local state and redirect
+                    localStorage.removeItem('userId');
+                    window.location.href = 'index.html';
+                }
+            });
+        }
     }
 
     // --- Helpers ---

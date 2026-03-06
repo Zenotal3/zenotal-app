@@ -119,10 +119,19 @@
                 <h2>Session History</h2>
                 <div id="sessionCards" class="session-cards-container"></div>
             </section>
+
+            <!-- Account & Sign Out -->
+            <section class="dashboard-account-section">
+                <div class="dashboard-account-info">
+                    <span class="dashboard-account-email" id="dashboardEmail"></span>
+                </div>
+                <button class="dashboard-signout-btn" id="dashboardSignOut">Sign Out</button>
+            </section>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+    <script type="module" src="/js/auth.js"></script>
     <script src="js/db.js"></script>
     <script src="js/pages/dashboard.js"></script>
 </body>

@@ -59,11 +59,10 @@ function updateAuthUI() {
     if (userInfo) {
       userInfo.style.display = 'flex';
       const displayName = currentUser.profile?.name || currentUser.email;
+      const initials = getInitials(displayName);
       userInfo.innerHTML = `
-        <span class="auth-user-email">${displayName}</span>
-        <button id="auth-sign-out" class="auth-btn auth-btn-signout">Sign Out</button>
+        <a href="dashboard.html" class="auth-avatar" title="${displayName}">${initials}</a>
       `;
-      document.getElementById('auth-sign-out')?.addEventListener('click', handleSignOut);
     }
   } else {
     if (signInBtn) signInBtn.style.display = 'block';
@@ -343,5 +342,22 @@ if (document.readyState === 'loading') {
   bindModalEvents();
 }
 
+// Get initials from name or email
+function getInitials(str) {
+  if (!str) return '?';
+  // If it looks like an email, use first letter of local part
+  if (str.includes('@')) {
+    return str.charAt(0).toUpperCase();
+  }
+  // Otherwise use first letter of each word (max 2)
+  var parts = str.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+  }
+  return parts[0].charAt(0).toUpperCase();
+}
+
 // Expose for other modules
 window.openAuthModal = openAuthModal;
+window.handleSignOut = handleSignOut;
+window.getCurrentUser = function() { return currentUser; };
