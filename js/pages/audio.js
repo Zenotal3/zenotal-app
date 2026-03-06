@@ -1075,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         localStorage.setItem('sessionCompletedEmotion', userEmotion || 'neutral');
 
         // Generate AI summary and save session to database, then redirect
-        const userId = localStorage.getItem('clerkUserId');
+        const userId = localStorage.getItem('userId') || localStorage.getItem('guestId');
         if (userId) {
             generateAndSaveSession(userId);
         } else {

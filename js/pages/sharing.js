@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function setupBackSideContent() {
         console.log('Setting up back side content');
 
-        const userId = localStorage.getItem('clerkUserId');
+        const userId = localStorage.getItem('userId') || localStorage.getItem('guestId');
         if (userId) {
             const sessions = await fetchRecentSessions(userId, 3);
             populateJournalColumns(sessions);

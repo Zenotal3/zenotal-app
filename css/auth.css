@@ -22,23 +22,23 @@
     transition: all 0.3s ease;
 }
 
-#clerk-sign-in {
+#auth-sign-in {
     background: transparent;
     color: #0F0F0F;
     border: 1px solid rgba(15, 15, 15, 0.2);
 }
 
-#clerk-sign-in:hover {
+#auth-sign-in:hover {
     background: rgba(15, 15, 15, 0.05);
     border-color: rgba(15, 15, 15, 0.3);
 }
 
-#clerk-sign-up {
+#auth-sign-up {
     background: #0F0F0F;
     color: #FFFFFF;
 }
 
-#clerk-sign-up:hover {
+#auth-sign-up:hover {
     background: #2A2A2A;
 }
 
@@ -55,51 +55,311 @@
     border-color: rgba(15, 15, 15, 0.3);
 }
 
-/* User Button */
-#clerk-user-button {
+/* User Info */
+#auth-user-info {
     display: none;
+    align-items: center;
+    gap: 12px;
 }
 
-/* Clerk UserButton styling - perfect circle with semi-transparent background */
-#clerk-user-button .cl-userButtonBox {
-    width: 44px !important;
-    height: 44px !important;
+.auth-user-email {
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #0F0F0F;
+    max-width: 180px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-#clerk-user-button .cl-userButtonTrigger {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
-    padding: 0 !important;
-    background: rgba(15, 15, 15, 0.1) !important;
-    backdrop-filter: blur(8px) !important;
-    border: 1px solid rgba(15, 15, 15, 0.15) !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+.auth-btn-signout {
+    background: transparent;
+    color: #0F0F0F;
+    border: 1px solid rgba(15, 15, 15, 0.2);
+    padding: 8px 16px;
+    font-size: 13px;
 }
 
-#clerk-user-button .cl-userButtonTrigger:hover {
-    background: rgba(15, 15, 15, 0.15) !important;
-    border-color: rgba(15, 15, 15, 0.25) !important;
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+.auth-btn-signout:hover {
+    background: rgba(15, 15, 15, 0.05);
+    border-color: rgba(15, 15, 15, 0.3);
 }
 
-#clerk-user-button .cl-userButtonAvatarBox {
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
+/* ─── Auth Modal ──────────────────────────────────────────────── */
+
+.auth-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
-#clerk-user-button .cl-avatarImage {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 50% !important;
-    object-fit: cover !important;
+.auth-modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
 }
 
-/* Focus state */
-#clerk-user-button .cl-userButtonTrigger:focus {
-    box-shadow: 0 0 0 2px rgba(15, 15, 15, 0.2) !important;
-    outline: none !important;
+.auth-modal-card {
+    background: #fff;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 420px;
+    padding: 40px 36px 32px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    transform: translateY(20px) scale(0.97);
+    transition: transform 0.3s ease;
+}
+
+.auth-modal-overlay.show .auth-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.auth-modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #999;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.auth-modal-close:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.auth-modal-title {
+    font-family: 'Outfit', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #0F0F0F;
+    margin: 0 0 24px;
+    text-align: center;
+}
+
+/* ─── Forms ───────────────────────────────────────────────────── */
+
+.auth-form {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.auth-form.active {
+    display: flex;
+}
+
+.auth-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.auth-input-group label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    color: #555;
+}
+
+.auth-input-group input {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    color: #0F0F0F;
+    background: #fafafa;
+}
+
+.auth-input-group input:focus {
+    border-color: #fe9166;
+    box-shadow: 0 0 0 3px rgba(254, 145, 102, 0.15);
+    background: #fff;
+}
+
+.auth-input-group input::placeholder {
+    color: #bbb;
+}
+
+/* Password requirements hint (fixes issue #1) */
+.auth-password-hint {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: #999;
+    margin-top: 2px;
+}
+
+/* Error message */
+.auth-error {
+    display: none;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    color: #e53e3e;
+    background: rgba(229, 62, 62, 0.06);
+    padding: 10px 12px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+/* Submit button */
+.auth-submit-btn {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    background: #fe9166;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.1s ease;
+    margin-top: 4px;
+}
+
+.auth-submit-btn:hover {
+    background: #fd7d4a;
+}
+
+.auth-submit-btn:active {
+    transform: scale(0.98);
+}
+
+.auth-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ─── Divider ─────────────────────────────────────────────────── */
+
+.auth-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e5e5;
+}
+
+.auth-divider span {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ─── OAuth Buttons ───────────────────────────────────────────── */
+
+.auth-oauth-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.auth-oauth-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background: #fff;
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-oauth-btn:hover {
+    background: #f7f7f7;
+    border-color: #ccc;
+}
+
+.auth-oauth-btn svg {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+/* ─── Toggle & Resend Links ──────────────────────────────────── */
+
+.auth-toggle {
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    color: #777;
+    text-align: center;
+    margin-top: 4px;
+}
+
+.auth-toggle a {
+    color: #fe9166;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-toggle a:hover {
+    text-decoration: underline;
+}
+
+/* Verification info text */
+.auth-verify-info {
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    line-height: 1.5;
+}
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+
+@media (max-width: 480px) {
+    .auth-modal-card {
+        margin: 16px;
+        padding: 28px 20px 24px;
+    }
+
+    .auth-header {
+        padding: 12px 16px;
+        gap: 8px;
+    }
+
+    .auth-btn {
+        padding: 8px 16px;
+        font-size: 13px;
+    }
+
+    .auth-user-email {
+        max-width: 120px;
+        font-size: 13px;
+    }
 }

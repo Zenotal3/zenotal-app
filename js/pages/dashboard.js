@@ -1,7 +1,7 @@
 // js/pages/dashboard.js - Dashboard logic
 
 (function () {
-    const userId = localStorage.getItem('clerkUserId');
+    const userId = localStorage.getItem('userId') || localStorage.getItem('guestId');
 
     const authGuard = document.getElementById('authGuard');
     const dashboardMain = document.getElementById('dashboardMain');
