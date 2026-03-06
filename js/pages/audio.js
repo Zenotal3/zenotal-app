@@ -1111,81 +1111,84 @@ document.addEventListener('DOMContentLoaded', async () => {
             needs: ''
         };
 
-        // Call AI to generate one word per dimension
-        try {
-            var aiResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'openai/gpt-4o-mini',
-                    messages: [{
-                        role: 'system',
-                        content: 'You are a mindfulness therapist. Based on user session data, produce exactly ONE word for each of 5 dimensions. Return ONLY valid JSON: {"feeling":"word","body_sensation":"word","thought":"word","impulse":"word","need":"word"}'
-                    }, {
-                        role: 'user',
-                        content: contextParts.join('. ') + '. Summarize this session into exactly one word per dimension. Examples: feeling=anxious, body_sensation=tightness, thought=failure, impulse=withdraw, need=safety. ONE word each, lowercase.'
-                    }]
-                })
-            });
-            if (aiResponse.ok) {
-                var aiData = await aiResponse.json();
-                var text = aiData.text || (aiData.choices && aiData.choices[0] && aiData.choices[0].message && aiData.choices[0].message.content) || '';
-                var jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    var insights = JSON.parse(jsonMatch[0]);
-                    console.log('AI session summary:', insights);
-                    if (insights.feeling) sessionRecord.feeling = insights.feeling;
-                    if (insights.body_sensation) sessionRecord.body_sensations = insights.body_sensation;
-                    if (insights.thought) sessionRecord.thoughts = insights.thought;
-                    if (insights.impulse) sessionRecord.impulses = insights.impulse;
-                    if (insights.need) sessionRecord.needs = insights.need;
-                }
-            }
-        } catch (e) {
-            console.warn('AI summary failed, saving with emotion only:', e);
-        }
-
-        // Generate empathetic session summary
+        // Only run AI extraction and read conversation data when user had a conversation
         var sessionSummary = '';
-        try {
-            var summaryResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: 'openai/gpt-4o-mini',
-                    messages: [{
-                        role: 'system',
-                        content: 'You are a compassionate mindfulness therapist. Write 2-3 empathetic sentences summarizing the user\'s session experience and one gentle suggestion. Be warm and validating. Do not use markdown or bullet points.'
-                    }, {
-                        role: 'user',
-                        content: contextParts.join('. ')
-                    }]
-                })
-            });
-            if (summaryResponse.ok) {
-                var summaryData = await summaryResponse.json();
-                sessionSummary = summaryData.text || (summaryData.choices && summaryData.choices[0] && summaryData.choices[0].message && summaryData.choices[0].message.content) || '';
-                sessionSummary = sessionSummary.trim();
-                console.log('AI session summary text:', sessionSummary);
+        if (conversationChoice === 'yes') {
+            // Call AI to generate one word per dimension
+            try {
+                var aiResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'openai/gpt-4o-mini',
+                        messages: [{
+                            role: 'system',
+                            content: 'You are a mindfulness therapist. Based on user session data, produce exactly ONE word for each of 5 dimensions. Return ONLY valid JSON: {"feeling":"word","body_sensation":"word","thought":"word","impulse":"word","need":"word"}'
+                        }, {
+                            role: 'user',
+                            content: contextParts.join('. ') + '. Summarize this session into exactly one word per dimension. Examples: feeling=anxious, body_sensation=tightness, thought=failure, impulse=withdraw, need=safety. ONE word each, lowercase.'
+                        }]
+                    })
+                });
+                if (aiResponse.ok) {
+                    var aiData = await aiResponse.json();
+                    var text = aiData.text || (aiData.choices && aiData.choices[0] && aiData.choices[0].message && aiData.choices[0].message.content) || '';
+                    var jsonMatch = text.match(/\{[\s\S]*\}/);
+                    if (jsonMatch) {
+                        var insights = JSON.parse(jsonMatch[0]);
+                        console.log('AI session summary:', insights);
+                        if (insights.feeling) sessionRecord.feeling = insights.feeling;
+                        if (insights.body_sensation) sessionRecord.body_sensations = insights.body_sensation;
+                        if (insights.thought) sessionRecord.thoughts = insights.thought;
+                        if (insights.impulse) sessionRecord.impulses = insights.impulse;
+                        if (insights.need) sessionRecord.needs = insights.need;
+                    }
+                }
+            } catch (e) {
+                console.warn('AI summary failed, saving with emotion only:', e);
             }
-        } catch (e2) {
-            console.warn('AI empathetic summary failed, continuing without:', e2);
+
+            // Generate empathetic session summary
+            try {
+                var summaryResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'openai/gpt-4o-mini',
+                        messages: [{
+                            role: 'system',
+                            content: 'You are a compassionate mindfulness therapist. Write 2-3 empathetic sentences summarizing the user\'s session experience and one gentle suggestion. Be warm and validating. Do not use markdown or bullet points.'
+                        }, {
+                            role: 'user',
+                            content: contextParts.join('. ')
+                        }]
+                    })
+                });
+                if (summaryResponse.ok) {
+                    var summaryData = await summaryResponse.json();
+                    sessionSummary = summaryData.text || (summaryData.choices && summaryData.choices[0] && summaryData.choices[0].message && summaryData.choices[0].message.content) || '';
+                    sessionSummary = sessionSummary.trim();
+                    console.log('AI session summary text:', sessionSummary);
+                }
+            } catch (e2) {
+                console.warn('AI empathetic summary failed, continuing without:', e2);
+            }
         }
 
         // Read rich extracted data from conversation (set by app.js during HCB flow)
-        var extractedBodySensations = JSON.parse(localStorage.getItem('bodySensations') || '[]');
-        var extractedThoughts = JSON.parse(localStorage.getItem('userThoughts') || '[]');
-        var extractedImpulses = JSON.parse(localStorage.getItem('userImpulses') || '[]');
-        var extractedNeeds = JSON.parse(localStorage.getItem('userNeed') || '[]');
+        var extractedBodySensations = conversationChoice === 'yes' ? JSON.parse(localStorage.getItem('bodySensations') || '[]') : [];
+        var extractedThoughts = conversationChoice === 'yes' ? JSON.parse(localStorage.getItem('userThoughts') || '[]') : [];
+        var extractedImpulses = conversationChoice === 'yes' ? JSON.parse(localStorage.getItem('userImpulses') || '[]') : [];
+        var extractedNeeds = conversationChoice === 'yes' ? JSON.parse(localStorage.getItem('userNeed') || '[]') : [];
         var selectedStressLevel = localStorage.getItem('userStressLevel') || localStorage.getItem('userStressScale') || '0';
 
-        // Save to database — prefer rich extracted phrases, fall back to AI one-word summaries
+        // Save to database — prefer rich extracted phrases, fall back to AI one-word summaries (blank if no conversation)
         saveSessionToDb({
             user_id: userId,
             emotion: sessionRecord.feeling || emotion,
