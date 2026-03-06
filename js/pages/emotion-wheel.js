@@ -1,6 +1,12 @@
 // Define the emotion wheel initialization function
 window.initializeEmotionWheel = function() {
     console.log('🎡 Emotion wheel initialization called');
+
+    // Clear previous session's extracted conversation data
+    localStorage.removeItem('bodySensations');
+    localStorage.removeItem('userThoughts');
+    localStorage.removeItem('userImpulses');
+    localStorage.removeItem('userNeed');
     
     const container = document.querySelector('.emotion-cards-container');
     const slider = document.querySelector('.emotion-cards-slider');
@@ -959,7 +965,7 @@ window.initializeEmotionWheel = function() {
         
         // Update slider visuals
         function updateStressSlider(level) {
-            const clampedLevel = Math.max(0, Math.min(100, level));
+            const clampedLevel = Math.round(Math.max(0, Math.min(100, level)));
             const handleX = sliderStart + (clampedLevel / 100) * sliderWidth;
             
             // Update handle position
@@ -998,7 +1004,7 @@ window.initializeEmotionWheel = function() {
                     textX = Math.min(handleX, 420); // Keep away from 100% label
                 }
                 currentPercentageText.setAttribute('x', textX);
-                currentPercentageText.textContent = Math.round(clampedLevel) + '%';
+                currentPercentageText.textContent = clampedLevel + '%';
             }
             
             // Update emoji expression based on stress level

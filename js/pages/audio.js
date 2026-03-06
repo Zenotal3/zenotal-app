@@ -1153,7 +1153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         var extractedThoughts = JSON.parse(localStorage.getItem('userThoughts') || '[]');
         var extractedImpulses = JSON.parse(localStorage.getItem('userImpulses') || '[]');
         var extractedNeeds = JSON.parse(localStorage.getItem('userNeed') || '[]');
-        var selectedStressLevel = localStorage.getItem('userStressScale') || localStorage.getItem('stressLevel') || '0';
+        var selectedStressLevel = localStorage.getItem('userStressLevel') || localStorage.getItem('userStressScale') || '0';
 
         // Save to database — prefer rich extracted phrases, fall back to AI one-word summaries
         saveSessionToDb({
@@ -1170,6 +1170,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             line_a: localStorage.getItem('lineA') || null,
             line_b: localStorage.getItem('lineB') || null
         });
+
+        // Clear extracted conversation data so it doesn't leak into the next session
+        localStorage.removeItem('bodySensations');
+        localStorage.removeItem('userThoughts');
+        localStorage.removeItem('userImpulses');
+        localStorage.removeItem('userNeed');
 
         // Redirect to sharing page after 3 seconds
         setTimeout(function() { window.location.href = 'sharing.html'; }, 3000);
