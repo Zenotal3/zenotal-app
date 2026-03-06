@@ -123,7 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function flipCard() {
+    function flipCard(event) {
+        // If the click came from the download button, don't flip
+        var downloadBtn = document.getElementById('journalDownloadButton');
+        if (downloadBtn && (downloadBtn === event.target || downloadBtn.contains(event.target))) {
+            return;
+        }
         console.log('Card clicked - flipping card');
         
         // Toggle the flipped state
@@ -245,7 +250,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Download functionality
     function setupDownloadButton() {
-        const downloadButton = document.getElementById('downloadButton');
+        const downloadButton = document.getElementById('journalDownloadButton') || document.getElementById('downloadButton');
         if (downloadButton) {
             downloadButton.addEventListener('click', (event) => {
                 event.stopPropagation(); // Prevent card flip
@@ -257,11 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function downloadCard() {
         console.log('Starting card download...');
-        
+
         try {
-            // Import html2canvas dynamically
-            const html2canvas = await import('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.esm.js');
-            
             // Get the card element
             const cardElement = document.querySelector('.session-card');
             if (!cardElement) {
@@ -269,10 +271,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Temporarily hide the download button for the screenshot
-            const downloadBtn = document.getElementById('downloadButton');
-            const originalDisplay = downloadBtn.style.display;
-            downloadBtn.style.display = 'none';
+            if (typeof window.html2canvas !== 'function') {
+                console.error('html2canvas not loaded');
+                alert('Download feature is not available. Please try again.');
+                return;
+            }
+
+            // Temporarily hide the download button and close button for the screenshot
+            const downloadBtn = document.getElementById('journalDownloadButton') || document.getElementById('downloadButton');
+            const closeBtn = document.getElementById('sessionCardClose');
+            const originalDownloadDisplay = downloadBtn ? downloadBtn.style.display : '';
+            const originalCloseDisplay = closeBtn ? closeBtn.style.cssText : '';
+            if (downloadBtn) downloadBtn.style.display = 'none';
+            if (closeBtn) closeBtn.style.cssText = 'display:none !important';
 
             // Configure html2canvas options
             const options = {
@@ -286,12 +297,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 scrollY: 0
             };
 
-            // Capture the card
+            // Capture the card using globally loaded html2canvas
             console.log('Capturing card with html2canvas...');
-            const canvas = await html2canvas.default(cardElement, options);
-            
-            // Restore download button
-            downloadBtn.style.display = originalDisplay;
+            const canvas = await window.html2canvas(cardElement, options);
+
+            // Restore download button and close button
+            if (downloadBtn) downloadBtn.style.display = originalDownloadDisplay;
+            if (closeBtn) closeBtn.style.cssText = originalCloseDisplay;
 
             // Create download link
             const link = document.createElement('a');

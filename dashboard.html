@@ -104,28 +104,20 @@
             <!-- Keyword Cloud -->
             <section class="keyword-cloud-card">
                 <h2>Keyword Cloud</h2>
+                <div class="kw-legend" id="kwLegend">
+                    <span class="kw-legend-item"><span class="kw-dot kw-dot-body"></span>Body</span>
+                    <span class="kw-legend-item"><span class="kw-dot kw-dot-thought"></span>Thought</span>
+                    <span class="kw-legend-item"><span class="kw-dot kw-dot-impulse"></span>Impulse</span>
+                    <span class="kw-legend-item"><span class="kw-dot kw-dot-need"></span>Need</span>
+                </div>
                 <div id="keywordCloud" class="keyword-cloud"></div>
+                <div id="kwPopover" class="kw-popover" style="display:none;"></div>
             </section>
 
-            <!-- Session History Table -->
+            <!-- Session History -->
             <section class="history-card">
                 <h2>Session History</h2>
-                <div class="table-wrapper">
-                    <table class="history-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Emotion</th>
-                                <th>Stress</th>
-                                <th>Body Sensation</th>
-                                <th>Thought</th>
-                                <th>Impulse</th>
-                                <th>Need</th>
-                            </tr>
-                        </thead>
-                        <tbody id="historyBody"></tbody>
-                    </table>
-                </div>
+                <div id="sessionCards" class="session-cards-container"></div>
             </section>
         </div>
     </div>

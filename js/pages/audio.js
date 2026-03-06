@@ -1148,6 +1148,36 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.warn('AI summary failed, saving with emotion only:', e);
         }
 
+        // Generate empathetic session summary
+        var sessionSummary = '';
+        try {
+            var summaryResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: 'openai/gpt-4o-mini',
+                    messages: [{
+                        role: 'system',
+                        content: 'You are a compassionate mindfulness therapist. Write 2-3 empathetic sentences summarizing the user\'s session experience and one gentle suggestion. Be warm and validating. Do not use markdown or bullet points.'
+                    }, {
+                        role: 'user',
+                        content: contextParts.join('. ')
+                    }]
+                })
+            });
+            if (summaryResponse.ok) {
+                var summaryData = await summaryResponse.json();
+                sessionSummary = summaryData.text || (summaryData.choices && summaryData.choices[0] && summaryData.choices[0].message && summaryData.choices[0].message.content) || '';
+                sessionSummary = sessionSummary.trim();
+                console.log('AI session summary text:', sessionSummary);
+            }
+        } catch (e2) {
+            console.warn('AI empathetic summary failed, continuing without:', e2);
+        }
+
         // Read rich extracted data from conversation (set by app.js during HCB flow)
         var extractedBodySensations = JSON.parse(localStorage.getItem('bodySensations') || '[]');
         var extractedThoughts = JSON.parse(localStorage.getItem('userThoughts') || '[]');
@@ -1168,7 +1198,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             impulses: extractedImpulses.length > 0 ? extractedImpulses : (sessionRecord.impulses ? [sessionRecord.impulses] : []),
             needs: extractedNeeds.length > 0 ? extractedNeeds : (sessionRecord.needs ? [sessionRecord.needs] : []),
             line_a: localStorage.getItem('lineA') || null,
-            line_b: localStorage.getItem('lineB') || null
+            line_b: localStorage.getItem('lineB') || null,
+            summary: sessionSummary || null
         });
 
         // Clear extracted conversation data so it doesn't leak into the next session

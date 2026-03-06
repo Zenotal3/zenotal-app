@@ -419,10 +419,9 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    writing-mode: vertical-lr;
-    transform: rotate(180deg);
     padding: clamp(4px, 0.5vh, 8px) clamp(2px, 0.3vw, 4px);
     min-height: clamp(60px, 10vh, 100px);
+    overflow: hidden;
 }
 
 .category-label {
@@ -434,6 +433,7 @@ html, body {
     text-align: center;
     line-height: 1.2;
     white-space: nowrap;
+    transform: rotate(-90deg);
 }
 
 .content-cell {
