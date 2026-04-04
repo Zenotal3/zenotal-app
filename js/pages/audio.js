@@ -1116,14 +1116,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (conversationChoice === 'yes') {
             // Call AI to generate one word per dimension
             try {
-                var aiResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                var aiResponse = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: 'openai/gpt-4o-mini',
+                        model: 'gpt-4o-mini',
                         messages: [{
                             role: 'system',
                             content: 'You are a mindfulness therapist. Based on user session data, produce exactly ONE word for each of 5 dimensions. Return ONLY valid JSON: {"feeling":"word","body_sensation":"word","thought":"word","impulse":"word","need":"word"}'
@@ -1153,14 +1150,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Generate empathetic session summary
             try {
-                var summaryResponse = await fetch('https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion', {
+                var summaryResponse = await fetch('/api/chat', {
                     method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + INSFORGE_ANON_KEY,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        model: 'openai/gpt-4o-mini',
+                        model: 'gpt-4o-mini',
                         messages: [{
                             role: 'system',
                             content: 'You are a compassionate mindfulness therapist. Write 2-3 empathetic sentences summarizing the user\'s session experience and one gentle suggestion. Be warm and validating. Do not use markdown or bullet points.'

@@ -1,4 +1,5 @@
-import insforge from './insforge.js';
+// js/auth.js - Authentication using Supabase (replaces InsForge auth)
+import supabase from './supabase.js';
 
 // Generate a UUID v4
 function generateUUID() {
@@ -21,7 +22,7 @@ let currentUser = null;
 // Restore session from InsForge
 async function restoreSession() {
   try {
-    const { data, error } = await insforge.auth.getCurrentSession();
+    const { data } = await supabase.auth.getSession();
     if (data?.session?.user) {
       currentUser = data.session.user;
       localStorage.setItem('userId', currentUser.id);
@@ -37,6 +38,19 @@ async function restoreSession() {
     ensureGuestId();
   }
 }
+
+// Listen for auth state changes (handles OAuth redirects)
+supabase.auth.onAuthStateChange((_event, session) => {
+  if (session?.user) {
+    currentUser = session.user;
+    localStorage.setItem('userId', currentUser.id);
+  } else {
+    currentUser = null;
+    localStorage.removeItem('userId');
+    ensureGuestId();
+  }
+  updateAuthUI();
+});
 
 // Ensure a guest ID exists
 function ensureGuestId() {
@@ -58,7 +72,7 @@ function updateAuthUI() {
     if (dashboardLink) dashboardLink.style.display = 'inline-block';
     if (userInfo) {
       userInfo.style.display = 'flex';
-      const displayName = currentUser.profile?.name || currentUser.email;
+      const displayName = currentUser.user_metadata?.name || currentUser.email;
       const initials = getInitials(displayName);
       userInfo.innerHTML = `
         <a href="dashboard.html" class="auth-avatar" title="${displayName}">${initials}</a>
@@ -160,10 +174,10 @@ async function handleSignUp(e) {
 
   setLoading(btn, true);
 
-  const { data, error } = await insforge.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    name: name || undefined,
+    options: { data: { name: name || '' } }
   });
 
   setLoading(btn, false);
@@ -173,15 +187,9 @@ async function handleSignUp(e) {
     return;
   }
 
-  if (data?.requireEmailVerification) {
-    pendingVerificationEmail = email;
-    switchModalMode('verify');
-  } else if (data?.accessToken) {
-    currentUser = data.user;
-    localStorage.setItem('userId', currentUser.id);
-    updateAuthUI();
-    closeAuthModal();
-  }
+  // Supabase sends a confirmation email
+  pendingVerificationEmail = email;
+  switchModalMode('verify');
 }
 
 async function handleSignIn(e) {
@@ -198,7 +206,7 @@ async function handleSignIn(e) {
 
   setLoading(btn, true);
 
-  const { data, error } = await insforge.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
   setLoading(btn, false);
 
@@ -237,9 +245,10 @@ async function handleVerify(e) {
 
   setLoading(btn, true);
 
-  const { data, error } = await insforge.auth.verifyEmail({
+  const { data, error } = await supabase.auth.verifyOtp({
     email: pendingVerificationEmail,
-    otp: code,
+    token: code,
+    type: 'signup',
   });
 
   setLoading(btn, false);
@@ -259,7 +268,8 @@ async function handleVerify(e) {
 
 async function handleResendCode() {
   if (!pendingVerificationEmail) return;
-  const { error } = await insforge.auth.resendVerificationEmail({
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
     email: pendingVerificationEmail,
   });
   const resendLink = document.getElementById('auth-resend-code');
@@ -270,14 +280,14 @@ async function handleResendCode() {
 }
 
 async function handleOAuth(provider) {
-  await insforge.auth.signInWithOAuth({
+  await supabase.auth.signInWithOAuth({
     provider,
-    redirectTo: window.location.origin + window.location.pathname,
+    options: { redirectTo: window.location.origin + window.location.pathname },
   });
 }
 
 async function handleSignOut() {
-  await insforge.auth.signOut();
+  await supabase.auth.signOut();
   currentUser = null;
   localStorage.removeItem('userId');
   ensureGuestId();

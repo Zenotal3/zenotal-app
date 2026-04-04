@@ -1,27 +1,8 @@
-// js/api.js
-// InsForge Edge Functions API configuration
-const INSFORGE_BASE_URL = 'https://dku2r8qi.us-east.insforge.app/functions';
+// js/api.js - API configuration using Vercel Serverless Functions
+// All AI calls now go through our own Vercel API routes
+const API_BASE_URL = '';
 
-// Legacy API_BASE_URL for backward compatibility (now uses InsForge)
-const API_BASE_URL = INSFORGE_BASE_URL;
-
-console.log('🌐 Using InsForge Functions:', INSFORGE_BASE_URL);
-
-// Test API connection
-async function testAPIConnection() {
-    try {
-        console.log('🔍 Testing InsForge connection...');
-        console.log('📍 InsForge Functions URL:', INSFORGE_BASE_URL);
-        console.log('✅ InsForge Edge Functions ready!');
-        return true;
-    } catch (error) {
-        console.error('❌ InsForge connection failed:', error);
-        return false;
-    }
-}
-
-// Test the API connection on load
-testAPIConnection();
+console.log('🌐 Using Vercel Serverless Functions');
 
 // General chat API - Uses InsForge AI directly
 async function callGemini(prompt, conversationHistory) {
@@ -36,17 +17,10 @@ async function callGemini(prompt, conversationHistory) {
         // Add current message
         messages.push({ role: 'user', content: prompt });
 
-        // Call InsForge AI
-        const response = await fetch(`https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion`, {
+        const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MTUwNjJ9.U67TMtikCA766p_euyOkVLFH6aH9zcSNNgkZgzeMRhE`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: messages
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages })
         });
 
         if (!response.ok) {
@@ -102,17 +76,10 @@ async function startHotCrossBun(emotion) {
             { role: 'user', content: `My emotion is ${emotion}.` }
         ];
 
-        // Call InsForge AI directly
-        const response = await fetch(`https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion`, {
+        const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MTUwNjJ9.U67TMtikCA766p_euyOkVLFH6aH9zcSNNgkZgzeMRhE`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: messages
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages })
         });
 
         if (!response.ok) {
@@ -143,17 +110,10 @@ async function sendHotCrossBunMessage(message, chatId = null) {
         const messages = conversationStore.get(chatId);
         messages.push({ role: 'user', content: message });
 
-        // Call InsForge AI
-        const response = await fetch(`https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion`, {
+        const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MTUwNjJ9.U67TMtikCA766p_euyOkVLFH6aH9zcSNNgkZgzeMRhE`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: messages
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages })
         });
 
         if (!response.ok) {
@@ -194,16 +154,10 @@ Style: gentle, natural, inviting, second-person, more general and welcoming. Nev
 Do not use any formatting, e.g. bold, italic in your response.`;
         }
 
-        const response = await fetch(`https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion`, {
+        const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MTUwNjJ9.U67TMtikCA766p_euyOkVLFH6aH9zcSNNgkZgzeMRhE`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: [{ role: 'user', content: prompt }]
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
         });
 
         if (!response.ok) {
@@ -240,16 +194,10 @@ Style: gentle, natural, inviting, second-person, more general and welcoming. Nev
 Do not use any formatting, e.g. bold, italic in your response.`;
         }
 
-        const response = await fetch(`https://dku2r8qi.us-east.insforge.app/api/ai/chat/completion`, {
+        const response = await fetch('/api/chat', {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3OC0xMjM0LTU2NzgtOTBhYi1jZGVmMTIzNDU2NzgiLCJlbWFpbCI6ImFub25AaW5zZm9yZ2UuY29tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM3MTUwNjJ9.U67TMtikCA766p_euyOkVLFH6aH9zcSNNgkZgzeMRhE`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                model: 'openai/gpt-4o',
-                messages: [{ role: 'user', content: prompt }]
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ messages: [{ role: 'user', content: prompt }] })
         });
 
         if (!response.ok) {
@@ -266,10 +214,10 @@ Do not use any formatting, e.g. bold, italic in your response.`;
     }
 }
 
-// Text-to-speech API - Uses InsForge TTS function
+// Text-to-speech API - Uses Vercel Serverless Function
 async function getTextToSpeech(text, voice = 'male') {
     try {
-        const response = await fetch(`${INSFORGE_BASE_URL}/tts`, {
+        const response = await fetch('/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text, voice })
@@ -286,34 +234,9 @@ async function getTextToSpeech(text, voice = 'male') {
     }
 }
 
-// Audio consolidation API - New function
+// Audio consolidation - handled client-side (no server needed)
 async function consolidateAudio(meditationComponents) {
-    try {
-        console.log('=== CONSOLIDATE AUDIO API CALL ===');
-        console.log('API URL:', `${API_BASE_URL}/api/mindfulness/consolidate-audio`);
-        console.log('Request data:', meditationComponents);
-        
-        const response = await fetch(`${API_BASE_URL}/api/mindfulness/consolidate-audio`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(meditationComponents)
-        });
-        
-        console.log('API response status:', response.status);
-        console.log('API response headers:', response.headers);
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API error response:', errorText);
-            throw new Error(`API returned status: ${response.status} - ${errorText}`);
-        }
-        
-        const data = await response.json();
-        console.log('API response data:', data);
-        
-        return data;
-    } catch (error) {
-        console.error('Audio consolidation API error:', error);
-        throw error;
-    }
+    // This function is handled client-side in audio.js
+    console.log('consolidateAudio called with:', meditationComponents);
+    return meditationComponents;
 }
