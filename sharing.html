@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="css/reset.css">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pages/sharing.css">
+    <link rel="stylesheet" href="css/auth.css">
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
 </head>
 <body>
@@ -237,6 +238,92 @@
         </div>
     </div>
 
+    <!-- Guest Register Prompt Modal -->
+    <div id="guestRegisterModal" class="guest-register-overlay">
+        <div class="guest-register-card">
+            <button id="guestRegisterClose" class="guest-register-close">&times;</button>
+            <div class="guest-register-icon">
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="24" cy="24" r="24" fill="#F08763" fill-opacity="0.15"/>
+                    <path d="M24 12C20.134 12 17 15.134 17 19C17 22.866 20.134 26 24 26C27.866 26 31 22.866 31 19C31 15.134 27.866 12 24 12Z" fill="#F08763"/>
+                    <path d="M12 36C12 31.029 17.373 27 24 27C30.627 27 36 31.029 36 36" stroke="#F08763" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h2 class="guest-register-title">Save Your Progress</h2>
+            <p class="guest-register-subtitle">Create a free account to keep your journal, track your emotional patterns, and build your reset habit.</p>
+            <button id="guestRegisterSave" class="guest-register-save-btn">Create Free Account</button>
+            <button id="guestRegisterSkip" class="guest-register-skip-btn">Maybe later</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal (reused from main app) -->
+    <div id="auth-modal" class="auth-modal-overlay">
+        <div class="auth-modal-card">
+            <button id="auth-modal-close" class="auth-modal-close">&times;</button>
+            <!-- Sign Up Form -->
+            <form id="auth-signup-form" class="auth-form" autocomplete="off">
+                <h2 class="auth-modal-title">Create Account</h2>
+                <div class="auth-error"></div>
+                <div class="auth-input-group">
+                    <label>Name (optional)</label>
+                    <input type="text" name="name" placeholder="Your name" autocomplete="name">
+                </div>
+                <div class="auth-input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="auth-input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Create a password" required autocomplete="new-password">
+                    <span class="auth-password-hint">At least 6 characters</span>
+                </div>
+                <button type="submit" class="auth-submit-btn">Sign Up</button>
+                <div class="auth-divider"><span>or</span></div>
+                <div class="auth-oauth-buttons">
+                    <button type="button" id="auth-oauth-google" class="auth-oauth-btn">
+                        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Google
+                    </button>
+                </div>
+                <p class="auth-toggle">Already have an account? <a href="#" id="auth-goto-signin">Sign In</a></p>
+            </form>
+            <!-- Sign In Form -->
+            <form id="auth-signin-form" class="auth-form" autocomplete="off">
+                <h2 class="auth-modal-title">Welcome Back</h2>
+                <div class="auth-error"></div>
+                <div class="auth-input-group">
+                    <label>Email</label>
+                    <input type="email" name="email" placeholder="you@example.com" required autocomplete="email">
+                </div>
+                <div class="auth-input-group">
+                    <label>Password</label>
+                    <input type="password" name="password" placeholder="Your password" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="auth-submit-btn">Sign In</button>
+                <div class="auth-divider"><span>or</span></div>
+                <div class="auth-oauth-buttons">
+                    <button type="button" class="auth-oauth-btn" onclick="document.getElementById('auth-oauth-google').click()">
+                        <svg viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                        Google
+                    </button>
+                </div>
+                <p class="auth-toggle">Need an account? <a href="#" id="auth-goto-signup">Sign Up</a></p>
+            </form>
+            <!-- Verify Email Form -->
+            <form id="auth-verify-form" class="auth-form" autocomplete="off">
+                <h2 class="auth-modal-title">Verify Email</h2>
+                <p class="auth-verify-info">We sent a 6-digit code to your email.<br>Enter it below to verify your account.</p>
+                <div class="auth-error"></div>
+                <div class="auth-input-group">
+                    <label>Verification Code</label>
+                    <input type="text" name="code" placeholder="123456" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autocomplete="one-time-code">
+                </div>
+                <button type="submit" class="auth-submit-btn">Verify</button>
+                <p class="auth-toggle">Didn't receive it? <a href="#" id="auth-resend-code">Resend code</a></p>
+            </form>
+        </div>
+    </div>
+
     <!-- Popup Window -->
     <div class="popup-overlay" id="popupOverlay">
         <div class="popup-window">
@@ -347,6 +434,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="js/db.js"></script>
+    <script type="module" src="/js/auth.js"></script>
     <script src="js/pages/sharing.js"></script>
 </body>
 </html>

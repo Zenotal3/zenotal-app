@@ -59,6 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize sharing popup functionality
         initializeSharingPopup();
         
+        // Setup guest register modal
+        setupGuestRegisterModal();
+        
         // Remove loading state after initialization
         setTimeout(() => {
             sharingContainer.classList.remove('loading');
@@ -114,12 +117,85 @@ document.addEventListener('DOMContentLoaded', () => {
         if (closeButton) {
             closeButton.addEventListener('click', (event) => {
                 event.stopPropagation(); // Prevent card flip when clicking close button
-                console.log('Session card close button clicked - showing donation popup');
+                console.log('Session card close button clicked');
                 
-                // Show the donation popup directly
+                // Check if user is a guest (no userId, only guestId)
+                const userId = localStorage.getItem('userId');
+                const guestId = localStorage.getItem('guestId');
+                
+                if (!userId && guestId) {
+                    // Guest user - show register prompt first
+                    console.log('Guest user detected - showing register prompt');
+                    showGuestRegisterModal();
+                } else {
+                    // Registered user - show donation popup directly
+                    console.log('Registered user - showing donation popup');
+                    showPopup();
+                }
+            });
+            console.log('Session card close button setup complete');
+        }
+    }
+
+    function showGuestRegisterModal() {
+        const modal = document.getElementById('guestRegisterModal');
+        if (modal) {
+            modal.classList.add('show');
+            console.log('Guest register modal shown');
+        }
+    }
+
+    function hideGuestRegisterModal() {
+        const modal = document.getElementById('guestRegisterModal');
+        if (modal) {
+            modal.classList.remove('show');
+        }
+    }
+
+    function setupGuestRegisterModal() {
+        const saveBtn = document.getElementById('guestRegisterSave');
+        const skipBtn = document.getElementById('guestRegisterSkip');
+        const closeBtn = document.getElementById('guestRegisterClose');
+        const modal = document.getElementById('guestRegisterModal');
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => {
+                console.log('Guest chose to register');
+                hideGuestRegisterModal();
+                // Open auth modal in signup mode
+                if (typeof window.openAuthModal === 'function') {
+                    window.openAuthModal('signup');
+                } else {
+                    // Fallback: redirect to main page with signup intent
+                    window.location.href = 'index.html?signup=true';
+                }
+            });
+        }
+
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                console.log('Guest chose to skip registration');
+                hideGuestRegisterModal();
+                // Show donation popup after skipping
                 showPopup();
             });
-            console.log('Session card close button setup complete - leads to donation popup');
+        }
+
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                hideGuestRegisterModal();
+                showPopup();
+            });
+        }
+
+        // Close on overlay click
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    hideGuestRegisterModal();
+                    showPopup();
+                }
+            });
         }
     }
 

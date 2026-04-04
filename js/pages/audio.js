@@ -926,12 +926,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             isPlaying = false;
             
             console.log('✅ All timing variables reset to 0 before starting');
+            // Start BGM when session begins
+            startBGM();
             playNextSegment();
             return;
         }
         
         if (isPlaying) {
             audioElement.pause();
+            pauseBGM();
             if (playIcon && pauseIcon) {
                 playIcon.style.display = 'block';
                 pauseIcon.style.display = 'none';
@@ -941,6 +944,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 console.error('Error playing audio:', e);
                 showAudioError();
             });
+            resumeBGM();
             if (playIcon && pauseIcon) {
                 playIcon.style.display = 'none';
                 pauseIcon.style.display = 'block';
@@ -1065,6 +1069,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showSessionComplete() {
         if (sessionSaved) return;
         sessionSaved = true;
+        // Fade out BGM when session completes
+        stopBGM();
         // Check if sessionComplete element exists (it might have been removed)
         if (sessionComplete) {
             sessionComplete.classList.add('visible');
@@ -2074,6 +2080,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function finishSession() {
+        // Stop BGM before navigating away
+        stopBGM();
         // Keep session completion data for sharing page
         // localStorage.removeItem('conversationChoice');
         // localStorage.removeItem('chatHistory');
@@ -2090,6 +2098,199 @@ document.addEventListener('DOMContentLoaded', async () => {
         const byteArray = new Uint8Array(byteNumbers);
         return new Blob([byteArray], { type: mimeType });
     }
+
+    // ─── Background Meditation Music (BGM) Manager ─────────────────────────────
+    // Uses Web Audio API to synthesize ambient meditation sounds:
+    // - Pink noise (gentle, natural-sounding background)
+    // - Soft binaural-style low-frequency tones (theta range 4-8Hz) for relaxation
+    // No external files needed; runs entirely in the browser.
+
+    const BGM_TRACKS = [
+        { name: 'Gentle Rain', type: 'rain' },
+        { name: 'Forest Ambience', type: 'forest' },
+        { name: 'Ocean Waves', type: 'ocean' },
+        { name: 'Soft Wind', type: 'wind' },
+    ];
+
+    let bgmContext = null;
+    let bgmNodes = [];
+    let bgmGainNode = null;
+    let bgmRunning = false;
+    let bgmFadeInterval = null;
+    const BGM_VOLUME = 0.18; // 18% volume - subtle background
+
+    function createBGM() {
+        try {
+            // Pick a random track type
+            const track = BGM_TRACKS[Math.floor(Math.random() * BGM_TRACKS.length)];
+            console.log('🎵 BGM: Starting', track.name);
+
+            bgmContext = new (window.AudioContext || window.webkitAudioContext)();
+            bgmGainNode = bgmContext.createGain();
+            bgmGainNode.gain.setValueAtTime(0, bgmContext.currentTime);
+            bgmGainNode.connect(bgmContext.destination);
+
+            // Create pink noise buffer
+            const bufferSize = bgmContext.sampleRate * 4; // 4-second loop
+            const noiseBuffer = bgmContext.createBuffer(2, bufferSize, bgmContext.sampleRate);
+
+            for (let channel = 0; channel < 2; channel++) {
+                const data = noiseBuffer.getChannelData(channel);
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    // Pink noise filter coefficients
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                    b6 = white * 0.115926;
+                }
+            }
+
+            // Create looping noise source
+            const noiseSource = bgmContext.createBufferSource();
+            noiseSource.buffer = noiseBuffer;
+            noiseSource.loop = true;
+
+            // Apply low-pass filter based on track type
+            const filter = bgmContext.createBiquadFilter();
+            filter.type = 'lowpass';
+
+            if (track.type === 'rain') {
+                filter.frequency.value = 2800;
+                filter.Q.value = 0.5;
+            } else if (track.type === 'forest') {
+                filter.frequency.value = 1800;
+                filter.Q.value = 0.8;
+            } else if (track.type === 'ocean') {
+                // Ocean: add slow LFO modulation for wave effect
+                filter.frequency.value = 1200;
+                filter.Q.value = 1.2;
+                const lfo = bgmContext.createOscillator();
+                const lfoGain = bgmContext.createGain();
+                lfo.frequency.value = 0.15; // Very slow wave
+                lfoGain.gain.value = 400;
+                lfo.connect(lfoGain);
+                lfoGain.connect(filter.frequency);
+                lfo.start();
+                bgmNodes.push(lfo);
+            } else if (track.type === 'wind') {
+                filter.frequency.value = 900;
+                filter.Q.value = 0.3;
+            }
+
+            // Add a gentle high-pass to remove rumble
+            const highPass = bgmContext.createBiquadFilter();
+            highPass.type = 'highpass';
+            highPass.frequency.value = 80;
+
+            // Add soft theta-wave tone (6Hz binaural beat effect via amplitude modulation)
+            const toneOsc = bgmContext.createOscillator();
+            const toneGain = bgmContext.createGain();
+            toneOsc.frequency.value = 120; // 120Hz carrier
+            toneOsc.type = 'sine';
+            toneGain.gain.value = 0.04; // Very subtle tone
+
+            const thetaLFO = bgmContext.createOscillator();
+            const thetaLFOGain = bgmContext.createGain();
+            thetaLFO.frequency.value = 6; // 6Hz theta wave
+            thetaLFOGain.gain.value = 0.03;
+            thetaLFO.connect(thetaLFOGain);
+            thetaLFOGain.connect(toneGain.gain);
+
+            // Connect the audio graph
+            noiseSource.connect(filter);
+            filter.connect(highPass);
+            highPass.connect(bgmGainNode);
+            toneOsc.connect(toneGain);
+            toneGain.connect(bgmGainNode);
+
+            noiseSource.start();
+            toneOsc.start();
+            thetaLFO.start();
+
+            bgmNodes.push(noiseSource, toneOsc, thetaLFO);
+            bgmRunning = true;
+
+            console.log('🎵 BGM: Audio graph created successfully');
+        } catch (e) {
+            console.warn('BGM creation failed (non-critical):', e);
+        }
+    }
+
+    function startBGM() {
+        if (bgmRunning && bgmContext) {
+            // Resume if suspended
+            if (bgmContext.state === 'suspended') {
+                bgmContext.resume();
+            }
+            // Fade in
+            fadeBGM(BGM_VOLUME, 2000);
+            return;
+        }
+        createBGM();
+        if (bgmGainNode) {
+            fadeBGM(BGM_VOLUME, 2000); // 2s fade-in
+        }
+    }
+
+    function pauseBGM() {
+        if (bgmContext && bgmContext.state === 'running') {
+            fadeBGM(0, 500, () => {
+                bgmContext.suspend();
+            });
+        }
+    }
+
+    function resumeBGM() {
+        if (bgmContext && bgmContext.state === 'suspended') {
+            bgmContext.resume().then(() => {
+                fadeBGM(BGM_VOLUME, 500);
+            });
+        }
+    }
+
+    function stopBGM() {
+        fadeBGM(0, 2500, () => {
+            bgmNodes.forEach(node => {
+                try { node.stop(); } catch(e) {}
+            });
+            bgmNodes = [];
+            if (bgmContext) {
+                bgmContext.close();
+                bgmContext = null;
+            }
+            bgmRunning = false;
+            console.log('🎵 BGM: Stopped and cleaned up');
+        });
+    }
+
+    function fadeBGM(targetVolume, durationMs, onComplete) {
+        if (!bgmGainNode || !bgmContext) return;
+        if (bgmFadeInterval) clearInterval(bgmFadeInterval);
+
+        const startVolume = bgmGainNode.gain.value;
+        const steps = 30;
+        const stepDuration = durationMs / steps;
+        const volumeDelta = (targetVolume - startVolume) / steps;
+        let step = 0;
+
+        bgmFadeInterval = setInterval(() => {
+            step++;
+            const newVol = Math.max(0, Math.min(1, startVolume + volumeDelta * step));
+            if (bgmGainNode) bgmGainNode.gain.setValueAtTime(newVol, bgmContext.currentTime);
+            if (step >= steps) {
+                clearInterval(bgmFadeInterval);
+                bgmFadeInterval = null;
+                if (onComplete) onComplete();
+            }
+        }, stepDuration);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
 
     // Initial UI state
     audioContainer && audioContainer.classList.add('loading');
