@@ -177,7 +177,10 @@ async function handleSignUp(e) {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options: { data: { name: name || '' } }
+    options: {
+      data: { name: name || '' },
+      emailRedirectTo: 'https://zenotal-app-zeta.vercel.app/dashboard.html'
+    }
   });
 
   setLoading(btn, false);
