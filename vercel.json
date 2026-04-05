@@ -4,6 +4,7 @@
   "framework": null,
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat.js" },
-    { "source": "/api/tts", "destination": "/api/tts.js" }
+    { "source": "/api/tts", "destination": "/api/tts.js" },
+    { "source": "/api/estimate-duration", "destination": "/api/estimate-duration.js" }
   ]
 }
