@@ -1536,7 +1536,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Stop and hide video element completely
         if (loadingVideo) {
             loadingVideo.pause();
-            loadingVideo.style.display = 'none !important';
+            loadingVideo.style.setProperty('display', 'none', 'important');
             loadingVideo.style.visibility = 'hidden';
             loadingVideo.style.opacity = '0';
             console.log('✅ Video element hidden');
@@ -1545,7 +1545,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Stop canvas animation and hide canvas
         stopCanvasAnimation();
         if (loadingCanvas) {
-            loadingCanvas.style.display = 'none !important';
+            loadingCanvas.style.setProperty('display', 'none', 'important');
             loadingCanvas.style.visibility = 'hidden';
             loadingCanvas.style.opacity = '0';
             console.log('✅ Canvas element hidden');
