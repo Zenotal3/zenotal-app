@@ -3,132 +3,208 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zenotal - Dashboard</title>
-
+    <title>Zenotal — My Journey</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/pages/dashboard.css">
     <link rel="icon" href="assets/icons/favicon.svg" type="image/svg+xml">
 </head>
 <body>
+
     <!-- Auth Guard: Not Logged In -->
-    <div id="authGuard" class="dashboard-auth-guard">
-        <div class="auth-guard-content">
-            <h1>Welcome to your Dashboard</h1>
-            <p>Sign in to view your session history, trends, and insights.</p>
-            <a href="index.html" class="auth-guard-btn">Go to Sign In</a>
+    <div id="authGuard" class="auth-guard">
+        <div class="auth-guard-inner">
+            <div class="auth-guard-logo">
+                <svg width="44" height="44" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="20" fill="url(#gGuard)"/>
+                    <circle cx="20" cy="20" r="10" stroke="white" stroke-width="2" fill="none"/>
+                    <circle cx="20" cy="20" r="4" fill="white"/>
+                    <defs><linearGradient id="gGuard" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#E68872"/><stop offset="1" stop-color="#C4536A"/></linearGradient></defs>
+                </svg>
+                <span>zenotal</span>
+            </div>
+            <h1>Your journey starts here</h1>
+            <p>Sign in to see your emotional patterns, session history, and insights.</p>
+            <a href="index.html" class="btn-primary">Go to App</a>
         </div>
     </div>
 
     <!-- Dashboard: Logged In -->
-    <div id="dashboardMain" class="dashboard-container" style="display:none;">
-        <!-- Header -->
-        <header class="dashboard-header">
-            <a href="index.html" class="dashboard-back" title="Back to home">
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12.5 15L7.5 10L12.5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <div id="dashboardMain" style="display:none;">
+
+        <!-- Top Nav -->
+        <nav class="dash-nav">
+            <a href="index.html" class="dash-nav-logo">
+                <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="20" cy="20" r="20" fill="url(#gNav)"/>
+                    <circle cx="20" cy="20" r="10" stroke="white" stroke-width="2" fill="none"/>
+                    <circle cx="20" cy="20" r="4" fill="white"/>
+                    <defs><linearGradient id="gNav" x1="0" y1="0" x2="40" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#E68872"/><stop offset="1" stop-color="#C4536A"/></linearGradient></defs>
                 </svg>
-                Home
+                <span>zenotal</span>
             </a>
-            <h1>My Journey</h1>
-        </header>
+            <div class="dash-nav-right">
+                <span class="dash-nav-email" id="dashboardEmail"></span>
+                <button class="btn-signout" id="dashboardSignOut">Sign out</button>
+            </div>
+        </nav>
+
+        <!-- Hero -->
+        <section class="dash-hero">
+            <div class="dash-hero-inner">
+                <div class="dash-hero-text">
+                    <p class="dash-greeting" id="dashGreeting">Good morning</p>
+                    <h1 class="dash-hero-title">My Journey</h1>
+                    <p class="dash-hero-sub" id="dashHeroSub">Keep showing up for yourself.</p>
+                </div>
+                <div class="dash-streak" id="dashStreakBadge" style="display:none;">
+                    <span class="dash-streak-fire">🔥</span>
+                    <span class="dash-streak-num" id="dashStreakNum">0</span>
+                    <span class="dash-streak-label">day streak</span>
+                </div>
+            </div>
+        </section>
 
         <!-- Loading State -->
-        <div id="dashboardLoading" class="dashboard-loading">
-            <p>Loading your sessions...</p>
+        <div id="dashboardLoading" class="dash-loading">
+            <div class="dash-spinner"></div>
+            <p>Loading your sessions…</p>
         </div>
 
         <!-- Empty State -->
-        <div id="dashboardEmpty" class="dashboard-empty" style="display:none;">
-            <h2>No sessions yet</h2>
-            <p>Complete your first reset to start seeing insights here.</p>
-            <a href="index.html" class="dashboard-btn">Start a Reset</a>
+        <div id="dashboardEmpty" class="dash-empty" style="display:none;">
+            <div class="dash-empty-icon">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="30" r="30" fill="url(#gEmpty)"/>
+                    <circle cx="30" cy="30" r="15" stroke="white" stroke-width="2.5" fill="none"/>
+                    <circle cx="30" cy="30" r="5.5" fill="white"/>
+                    <defs><linearGradient id="gEmpty" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#E68872"/><stop offset="1" stop-color="#C4536A"/></linearGradient></defs>
+                </svg>
+            </div>
+            <h2>Your journey begins now</h2>
+            <p>Complete your first reset to start seeing your emotional patterns and insights here.</p>
+            <a href="index.html" class="btn-primary">Start a Reset</a>
         </div>
 
         <!-- Dashboard Content -->
-        <div id="dashboardContent" style="display:none;">
-            <!-- Summary Cards -->
-            <section class="summary-cards">
-                <div class="summary-card">
-                    <span class="summary-label">Total Sessions</span>
-                    <span class="summary-value" id="totalSessions">0</span>
+        <div id="dashboardContent" class="dash-content" style="display:none;">
+
+            <!-- Stats Row -->
+            <section class="dash-stats">
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--coral">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    </div>
+                    <div class="stat-body">
+                        <span class="stat-value" id="totalSessions">0</span>
+                        <span class="stat-label">Total Resets</span>
+                    </div>
                 </div>
-                <div class="summary-card">
-                    <span class="summary-label">Most Frequent Emotion</span>
-                    <span class="summary-value" id="topEmotion">--</span>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--teal">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    </div>
+                    <div class="stat-body">
+                        <span class="stat-value" id="topEmotion">--</span>
+                        <span class="stat-label">Top Emotion</span>
+                    </div>
                 </div>
-                <div class="summary-card">
-                    <span class="summary-label">Average Stress</span>
-                    <span class="summary-value" id="avgStress">--</span>
+                <div class="stat-card">
+                    <div class="stat-icon stat-icon--purple">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                    </div>
+                    <div class="stat-body">
+                        <span class="stat-value" id="avgStress">--</span>
+                        <span class="stat-label">Avg Stress</span>
+                    </div>
                 </div>
             </section>
 
             <!-- Last Session -->
-            <section class="last-session-card">
-                <h2>Last Session</h2>
-                <div class="last-session-details">
-                    <div class="detail-row"><span class="detail-label">Date</span><span id="lastDate">--</span></div>
-                    <div class="detail-row"><span class="detail-label">Emotion</span><span id="lastEmotion">--</span></div>
-                    <div class="detail-row"><span class="detail-label">Body Sensation</span><span id="lastBody">--</span></div>
-                    <div class="detail-row"><span class="detail-label">Thought</span><span id="lastThought">--</span></div>
-                    <div class="detail-row"><span class="detail-label">Impulse</span><span id="lastImpulse">--</span></div>
-                    <div class="detail-row"><span class="detail-label">Need</span><span id="lastNeed">--</span></div>
+            <section class="dash-card dash-last">
+                <div class="section-header">
+                    <h2>Last Reset</h2>
+                    <a href="index.html" class="btn-ghost">New Reset →</a>
                 </div>
-                <a href="index.html" class="dashboard-btn">Start New Reset</a>
+                <div class="last-grid">
+                    <div class="last-field">
+                        <span class="last-label">Date</span>
+                        <span class="last-value" id="lastDate">--</span>
+                    </div>
+                    <div class="last-field">
+                        <span class="last-label">Emotion</span>
+                        <span class="last-value last-emotion" id="lastEmotion">--</span>
+                    </div>
+                    <div class="last-field">
+                        <span class="last-label">Body Sensation</span>
+                        <span class="last-value" id="lastBody">--</span>
+                    </div>
+                    <div class="last-field">
+                        <span class="last-label">Thought</span>
+                        <span class="last-value" id="lastThought">--</span>
+                    </div>
+                    <div class="last-field">
+                        <span class="last-label">Impulse</span>
+                        <span class="last-value" id="lastImpulse">--</span>
+                    </div>
+                    <div class="last-field">
+                        <span class="last-label">Need</span>
+                        <span class="last-value" id="lastNeed">--</span>
+                    </div>
+                </div>
             </section>
 
-            <!-- Charts Row -->
-            <section class="charts-row">
-                <!-- Emotion Trend -->
-                <div class="chart-card">
-                    <div class="chart-header">
+            <!-- Charts -->
+            <section class="dash-charts">
+                <div class="dash-card chart-card">
+                    <div class="section-header">
                         <h2>Emotion Trend</h2>
                         <div class="chart-toggle">
-                            <button class="toggle-btn active" data-days="7">7 days</button>
-                            <button class="toggle-btn" data-days="30">30 days</button>
+                            <button class="toggle-btn active" data-days="7">7d</button>
+                            <button class="toggle-btn" data-days="30">30d</button>
                         </div>
                     </div>
-                    <canvas id="emotionChart"></canvas>
+                    <div class="chart-wrap">
+                        <canvas id="emotionChart"></canvas>
+                    </div>
                 </div>
-
-                <!-- Stress Distribution -->
-                <div class="chart-card">
-                    <h2>Stress Distribution</h2>
-                    <canvas id="stressChart"></canvas>
+                <div class="dash-card chart-card">
+                    <div class="section-header">
+                        <h2>Stress Distribution</h2>
+                    </div>
+                    <div class="chart-wrap chart-wrap--donut">
+                        <canvas id="stressChart"></canvas>
+                    </div>
                 </div>
             </section>
 
             <!-- Keyword Cloud -->
-            <section class="keyword-cloud-card">
-                <h2>Keyword Cloud</h2>
-                <div class="kw-legend" id="kwLegend">
-                    <span class="kw-legend-item"><span class="kw-dot kw-dot-body"></span>Body</span>
-                    <span class="kw-legend-item"><span class="kw-dot kw-dot-thought"></span>Thought</span>
-                    <span class="kw-legend-item"><span class="kw-dot kw-dot-impulse"></span>Impulse</span>
-                    <span class="kw-legend-item"><span class="kw-dot kw-dot-need"></span>Need</span>
+            <section class="dash-card dash-keywords">
+                <div class="section-header">
+                    <h2>Keyword Cloud</h2>
+                    <div class="kw-legend" id="kwLegend">
+                        <span class="kw-leg"><span class="kw-dot kw-dot-body"></span>Body</span>
+                        <span class="kw-leg"><span class="kw-dot kw-dot-thought"></span>Thought</span>
+                        <span class="kw-leg"><span class="kw-dot kw-dot-impulse"></span>Impulse</span>
+                        <span class="kw-leg"><span class="kw-dot kw-dot-need"></span>Need</span>
+                    </div>
                 </div>
-                <div id="keywordCloud" class="keyword-cloud"></div>
+                <div id="keywordCloud" class="kw-cloud"></div>
                 <div id="kwPopover" class="kw-popover" style="display:none;"></div>
             </section>
 
             <!-- Session History -->
-            <section class="history-card">
-                <h2>Session History</h2>
-                <div id="sessionCards" class="session-cards-container"></div>
+            <section class="dash-card dash-history">
+                <div class="section-header">
+                    <h2>Session History</h2>
+                </div>
+                <div id="sessionCards" class="history-list"></div>
             </section>
 
-            <!-- Account & Sign Out -->
-            <section class="dashboard-account-section">
-                <div class="dashboard-account-info">
-                    <span class="dashboard-account-email" id="dashboardEmail"></span>
-                </div>
-                <button class="dashboard-signout-btn" id="dashboardSignOut">Sign Out</button>
-            </section>
-        </div>
-    </div>
+        </div><!-- /dashboardContent -->
+    </div><!-- /dashboardMain -->
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
     <script type="module" src="/js/auth.js"></script>

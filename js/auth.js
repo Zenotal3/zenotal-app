@@ -224,12 +224,17 @@ async function handleSignIn(e) {
     updateAuthUI();
     closeAuthModal();
 
-    // Resume pending navigation
+    // Resume pending navigation, otherwise go to dashboard
     const pending = sessionStorage.getItem('pendingNavigation');
     if (pending) {
       sessionStorage.removeItem('pendingNavigation');
       setTimeout(() => {
         if (window.navigateTo) window.navigateTo(pending);
+        else window.location.href = 'dashboard.html';
+      }, 300);
+    } else {
+      setTimeout(() => {
+        window.location.href = 'dashboard.html';
       }, 300);
     }
   }
@@ -266,6 +271,10 @@ async function handleVerify(e) {
     localStorage.setItem('userId', currentUser.id);
     updateAuthUI();
     closeAuthModal();
+    // After email verification, go to dashboard
+    setTimeout(() => {
+      window.location.href = 'dashboard.html';
+    }, 300);
   }
 }
 

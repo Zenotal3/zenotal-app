@@ -263,11 +263,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (session) {
                 if (dateEl) dateEl.textContent = formatDate(session.created_at);
-                if (feelingsEl) feelingsEl.textContent = session.emotion || '';
-                if (sensationsEl) sensationsEl.textContent = firstItem(session.body_sensations);
-                if (thoughtsEl) thoughtsEl.textContent = firstItem(session.thoughts);
-                if (impulsesEl) impulsesEl.textContent = firstItem(session.impulses);
-                if (needEl) needEl.textContent = firstItem(session.needs);
+                if (feelingsEl) feelingsEl.textContent = session.emotion || '\u2014';
+                // Show em-dash with reduced opacity for empty fields (no-conversation sessions)
+                const setField = function(el, val) {
+                    if (!el) return;
+                    if (val) {
+                        el.textContent = val;
+                        el.style.opacity = '';
+                    } else {
+                        el.textContent = '\u2014';
+                        el.style.opacity = '0.3';
+                    }
+                };
+                setField(sensationsEl, firstItem(session.body_sensations));
+                setField(thoughtsEl, firstItem(session.thoughts));
+                setField(impulsesEl, firstItem(session.impulses));
+                setField(needEl, firstItem(session.needs));
             } else {
                 if (dateEl) dateEl.textContent = '';
                 if (feelingsEl) feelingsEl.textContent = '';

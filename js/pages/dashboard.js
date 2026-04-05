@@ -63,6 +63,58 @@
         renderSessionCards();
         setupToggle();
         setupAccount();
+        renderHero();
+    }
+
+    // --- Hero: greeting, streak, subtitle ---
+    function renderHero() {
+        // Greeting by time of day
+        var hour = new Date().getHours();
+        var greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+        var greetingEl = document.getElementById('dashGreeting');
+        if (greetingEl) greetingEl.textContent = greeting;
+
+        // Subtitle: motivational based on session count
+        var subEl = document.getElementById('dashHeroSub');
+        if (subEl) {
+            var n = allSessions.length;
+            if (n === 1) subEl.textContent = 'Your first step. Keep going.';
+            else if (n < 5) subEl.textContent = 'Every reset counts. You\'re building a habit.';
+            else if (n < 10) subEl.textContent = 'You\'re developing real self-awareness.';
+            else subEl.textContent = 'Your consistency is your superpower.';
+        }
+
+        // Streak: count consecutive days with at least one session
+        var streak = computeStreak(allSessions);
+        var badgeEl = document.getElementById('dashStreakBadge');
+        var numEl = document.getElementById('dashStreakNum');
+        if (badgeEl && numEl && streak > 1) {
+            numEl.textContent = streak;
+            badgeEl.style.display = 'flex';
+        }
+    }
+
+    function computeStreak(sessions) {
+        if (!sessions || sessions.length === 0) return 0;
+        // sessions are newest-first
+        var today = new Date();
+        today.setHours(0,0,0,0);
+        var streak = 0;
+        var checkDate = new Date(today);
+        var sessionDates = sessions.map(function(s) {
+            var d = new Date(s.created_at);
+            d.setHours(0,0,0,0);
+            return d.getTime();
+        });
+        while (true) {
+            if (sessionDates.indexOf(checkDate.getTime()) !== -1) {
+                streak++;
+                checkDate.setDate(checkDate.getDate() - 1);
+            } else {
+                break;
+            }
+        }
+        return streak;
     }
 
     // --- Summary Cards ---
