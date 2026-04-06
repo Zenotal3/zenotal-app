@@ -1,24 +1,40 @@
 // js/pages/dashboard.js - Dashboard logic
 
 (function () {
-    const userId = localStorage.getItem('userId') || localStorage.getItem('guestId');
-
     const authGuard = document.getElementById('authGuard');
     const dashboardMain = document.getElementById('dashboardMain');
     const dashboardLoading = document.getElementById('dashboardLoading');
     const dashboardEmpty = document.getElementById('dashboardEmpty');
     const dashboardContent = document.getElementById('dashboardContent');
 
-    if (!userId) {
-        // Not logged in
-        authGuard.style.display = 'flex';
-        dashboardMain.style.display = 'none';
-        return;
+    // Wait for auth.js to finish restoring session before checking userId
+    // auth.js fires 'zenotal:authReady' once it knows the auth state
+    function startDashboard() {
+        const userId = localStorage.getItem('userId') || localStorage.getItem('guestId');
+        if (!userId) {
+            authGuard.style.display = 'flex';
+            dashboardMain.style.display = 'none';
+            return;
+        }
+        // Logged in - show dashboard
+        authGuard.style.display = 'none';
+        dashboardMain.style.display = 'block';
+        initDashboard(userId);
     }
 
-    // Logged in - show dashboard
-    authGuard.style.display = 'none';
-    dashboardMain.style.display = 'block';
+    // auth.js may have already fired before this script ran (if auth was cached)
+    if (window.__zenotalAuthReady) {
+        startDashboard();
+    } else {
+        document.addEventListener('zenotal:authReady', startDashboard, { once: true });
+        // Fallback: if auth.js never fires (e.g. no auth.js on page), start after 2s
+        setTimeout(function() {
+            if (!window.__zenotalAuthReady) {
+                window.__zenotalAuthReady = true;
+                startDashboard();
+            }
+        }, 2000);
+    }
 
     let allSessions = [];
     let emotionChart = null;
@@ -39,9 +55,7 @@
         need: 'What small step could meet this need today?'
     };
 
-    init();
-
-    async function init() {
+    async function initDashboard(userId) {  // called by startDashboard after auth is ready
         // fetchRecentSessions returns oldest-first (it reverses). We want newest-first for display.
         const fetched = await fetchRecentSessions(userId, 100);
         // fetched is oldest-first; reverse to newest-first

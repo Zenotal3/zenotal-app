@@ -2,11 +2,9 @@
 // Self-contained classic script (no ES module imports)
 // Supabase UMD must be loaded before this script via:
 //   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
 (function() {
     var SUPABASE_URL = 'https://npnpaimawwdxqlcvbfur.supabase.co';
     var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbnBhaW1hd3dkeHFsY3ZiZnVyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyNzcxNTMsImV4cCI6MjA5MDg1MzE1M30.oTUKF7oXJAiyuQfxl5qUJQci1baGxRpEu3cZaO8GAhY';
-
     var _supabase = null;
     function getSupabaseClient() {
         if (_supabase) return _supabase;
@@ -20,6 +18,7 @@
 
     /**
      * Save a completed session to the database.
+     * Works for both authenticated users and guests (using guestId).
      */
     window.saveSessionToDb = async function saveSessionToDb(sessionData) {
         try {
@@ -28,11 +27,12 @@
                 console.warn('Supabase client not available - skipping session save');
                 return null;
             }
-            var sessionResult = await client.auth.getSession();
-            var session = sessionResult.data && sessionResult.data.session;
-            var userId = (session && session.user && session.user.id) || localStorage.getItem('userId');
-            if (!userId || userId.startsWith('guest_')) {
-                console.log('Guest user - skipping session save');
+            // Use the userId passed in sessionData, or fall back to localStorage
+            var userId = sessionData.user_id
+                || localStorage.getItem('userId')
+                || localStorage.getItem('guestId');
+            if (!userId) {
+                console.warn('No user ID available - skipping session save');
                 return null;
             }
             var record = Object.assign({}, sessionData, { user_id: userId });
@@ -79,6 +79,31 @@
         } catch (error) {
             console.error('Error fetching sessions from database:', error);
             return [];
+        }
+    };
+
+    /**
+     * Migrate sessions from guestId to a new authenticated userId.
+     * Called after successful sign-up/sign-in.
+     */
+    window.migrateGuestSessions = async function migrateGuestSessions(guestId, newUserId) {
+        if (!guestId || !newUserId || guestId === newUserId) return;
+        try {
+            var client = getSupabaseClient();
+            if (!client) return;
+            var result = await client
+                .from('sessions')
+                .update({ user_id: newUserId })
+                .eq('user_id', guestId);
+            if (result.error) {
+                console.error('Failed to migrate guest sessions:', result.error);
+            } else {
+                console.log('Guest sessions migrated from', guestId, 'to', newUserId);
+                // Clear guestId now that data is migrated
+                localStorage.removeItem('guestId');
+            }
+        } catch (error) {
+            console.error('Error migrating guest sessions:', error);
         }
     };
 })();

@@ -311,15 +311,10 @@
             </form>
             <!-- Verify Email Form -->
             <form id="auth-verify-form" class="auth-form" autocomplete="off">
-                <h2 class="auth-modal-title">Verify Email</h2>
-                <p class="auth-verify-info">We sent a 6-digit code to your email.<br>Enter it below to verify your account.</p>
+                <h2 class="auth-modal-title">Check Your Email</h2>
+                <p class="auth-verify-info" style="text-align:center;line-height:1.6;">We've sent a confirmation link to your email.<br>Click the link to complete sign-up and access your dashboard.</p>
                 <div class="auth-error"></div>
-                <div class="auth-input-group">
-                    <label>Verification Code</label>
-                    <input type="text" name="code" placeholder="123456" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" required autocomplete="one-time-code">
-                </div>
-                <button type="submit" class="auth-submit-btn">Verify</button>
-                <p class="auth-toggle">Didn't receive it? <a href="#" id="auth-resend-code">Resend code</a></p>
+                <button type="submit" class="auth-submit-btn">Got it</button>
             </form>
         </div>
     </div>

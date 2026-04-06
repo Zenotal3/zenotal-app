@@ -1,4 +1,4 @@
-// js/auth.js - Authentication using Supabase (replaces InsForge auth)
+// js/auth.js - Authentication using Supabase
 import supabase from './supabase.js';
 
 // Generate a UUID v4
@@ -17,15 +17,25 @@ let currentUser = null;
   await restoreSession();
   updateAuthUI();
   setupEventListeners();
+  // Dispatch event so dashboard.js and other scripts know auth is ready
+  window.__zenotalAuthReady = true;
+  document.dispatchEvent(new CustomEvent('zenotal:authReady', {
+    detail: { user: currentUser }
+  }));
 })();
 
-// Restore session from InsForge
+// Restore session (handles magic link callback via URL hash automatically)
 async function restoreSession() {
   try {
     const { data } = await supabase.auth.getSession();
     if (data?.session?.user) {
       currentUser = data.session.user;
+      const prevGuestId = localStorage.getItem('guestId');
       localStorage.setItem('userId', currentUser.id);
+      // Migrate any guest sessions to the authenticated user
+      if (prevGuestId && prevGuestId !== currentUser.id && typeof window.migrateGuestSessions === 'function') {
+        await window.migrateGuestSessions(prevGuestId, currentUser.id);
+      }
     } else {
       currentUser = null;
       localStorage.removeItem('userId');
@@ -39,17 +49,26 @@ async function restoreSession() {
   }
 }
 
-// Listen for auth state changes (handles OAuth redirects)
-supabase.auth.onAuthStateChange((_event, session) => {
+// Listen for auth state changes (handles OAuth redirects and magic link)
+supabase.auth.onAuthStateChange(async (_event, session) => {
   if (session?.user) {
+    const prevGuestId = localStorage.getItem('guestId');
     currentUser = session.user;
     localStorage.setItem('userId', currentUser.id);
+    // Migrate guest sessions when user signs in
+    if (prevGuestId && prevGuestId !== currentUser.id && typeof window.migrateGuestSessions === 'function') {
+      await window.migrateGuestSessions(prevGuestId, currentUser.id);
+    }
   } else {
     currentUser = null;
     localStorage.removeItem('userId');
     ensureGuestId();
   }
   updateAuthUI();
+  // Re-dispatch auth ready so dashboard can react to sign-in/sign-out
+  document.dispatchEvent(new CustomEvent('zenotal:authReady', {
+    detail: { user: currentUser }
+  }));
 });
 
 // Ensure a guest ID exists
@@ -156,9 +175,6 @@ function setLoading(btn, loading) {
 
 // ─── Auth Handlers ───────────────────────────────────────────────────
 
-// Email for verification (stored between sign-up and verify steps)
-let pendingVerificationEmail = '';
-
 async function handleSignUp(e) {
   e.preventDefault();
   const form = document.getElementById('auth-signup-form');
@@ -179,7 +195,7 @@ async function handleSignUp(e) {
     password,
     options: {
       data: { name: name || '' },
-      emailRedirectTo: 'https://zenotal-app-zeta.vercel.app/dashboard.html'
+      emailRedirectTo: window.location.origin + '/dashboard.html'
     }
   });
 
@@ -190,8 +206,8 @@ async function handleSignUp(e) {
     return;
   }
 
-  // Supabase sends a confirmation email
-  pendingVerificationEmail = email;
+  // Show the verify step — but now we tell the user to click the link in their email
+  // (Supabase sends a magic link by default; the verify form shows a friendly message)
   switchModalMode('verify');
 }
 
@@ -220,81 +236,35 @@ async function handleSignIn(e) {
 
   if (data?.user) {
     currentUser = data.user;
+    const prevGuestId = localStorage.getItem('guestId');
     localStorage.setItem('userId', currentUser.id);
-    updateAuthUI();
-    closeAuthModal();
-
-    // Resume pending navigation, otherwise go to dashboard
-    const pending = sessionStorage.getItem('pendingNavigation');
-    if (pending) {
-      sessionStorage.removeItem('pendingNavigation');
-      setTimeout(() => {
-        if (window.navigateTo) window.navigateTo(pending);
-        else window.location.href = 'dashboard.html';
-      }, 300);
-    } else {
-      setTimeout(() => {
-        window.location.href = 'dashboard.html';
-      }, 300);
+    // Migrate guest sessions on sign-in
+    if (prevGuestId && prevGuestId !== currentUser.id && typeof window.migrateGuestSessions === 'function') {
+      await window.migrateGuestSessions(prevGuestId, currentUser.id);
     }
-  }
-}
-
-async function handleVerify(e) {
-  e.preventDefault();
-  const form = document.getElementById('auth-verify-form');
-  const code = form.querySelector('[name="code"]').value.trim();
-  const btn = form.querySelector('button[type="submit"]');
-
-  if (!code) {
-    showError('auth-verify-form', 'Please enter the verification code.');
-    return;
-  }
-
-  setLoading(btn, true);
-
-  const { data, error } = await supabase.auth.verifyOtp({
-    email: pendingVerificationEmail,
-    token: code,
-    type: 'signup',
-  });
-
-  setLoading(btn, false);
-
-  if (error) {
-    showError('auth-verify-form', error.message || 'Verification failed.');
-    return;
-  }
-
-  if (data?.user) {
-    currentUser = data.user;
-    localStorage.setItem('userId', currentUser.id);
     updateAuthUI();
     closeAuthModal();
-    // After email verification, go to dashboard
     setTimeout(() => {
       window.location.href = 'dashboard.html';
     }, 300);
   }
 }
 
+async function handleVerify(e) {
+  // This form is now just a "check your email" screen — no OTP input needed.
+  // The magic link in the email handles verification automatically.
+  e.preventDefault();
+  closeAuthModal();
+}
+
 async function handleResendCode() {
-  if (!pendingVerificationEmail) return;
-  const { error } = await supabase.auth.resend({
-    type: 'signup',
-    email: pendingVerificationEmail,
-  });
-  const resendLink = document.getElementById('auth-resend-code');
-  if (resendLink) {
-    resendLink.textContent = error ? 'Failed — try again' : 'Code sent!';
-    setTimeout(() => { resendLink.textContent = 'Resend code'; }, 3000);
-  }
+  // Not used in magic link flow, but kept for compatibility
 }
 
 async function handleOAuth(provider) {
   await supabase.auth.signInWithOAuth({
     provider,
-    options: { redirectTo: window.location.origin + window.location.pathname },
+    options: { redirectTo: window.location.origin + '/dashboard.html' },
   });
 }
 
@@ -332,17 +302,11 @@ function bindModalEvents() {
     switchModalMode('signup');
   });
 
-  // Resend code
-  document.getElementById('auth-resend-code')?.addEventListener('click', (e) => {
-    e.preventDefault();
-    handleResendCode();
-  });
-
   // OAuth
   document.getElementById('auth-oauth-google')?.addEventListener('click', () => handleOAuth('google'));
   document.getElementById('auth-oauth-github')?.addEventListener('click', () => handleOAuth('github'));
 
-  // Clear errors on input change (fixes issue #2)
+  // Clear errors on input change
   document.querySelectorAll('#auth-modal input').forEach(input => {
     input.addEventListener('input', () => {
       const form = input.closest('form');
@@ -367,11 +331,9 @@ if (document.readyState === 'loading') {
 // Get initials from name or email
 function getInitials(str) {
   if (!str) return '?';
-  // If it looks like an email, use first letter of local part
   if (str.includes('@')) {
     return str.charAt(0).toUpperCase();
   }
-  // Otherwise use first letter of each word (max 2)
   var parts = str.trim().split(/\s+/);
   if (parts.length >= 2) {
     return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
