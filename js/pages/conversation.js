@@ -118,6 +118,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Save that user chose to skip
         localStorage.setItem('conversationChoice', 'skip');
 
+        // Bug 1 fix: show a loading overlay immediately so user knows something is happening
+        const loadingOverlay = document.createElement('div');
+        loadingOverlay.id = 'skip-loading-overlay';
+        loadingOverlay.style.cssText = [
+            'position:fixed', 'top:0', 'left:0', 'width:100%', 'height:100%',
+            'background:rgba(255,255,255,0.92)', 'z-index:9998',
+            'display:flex', 'flex-direction:column', 'align-items:center', 'justify-content:center',
+            'gap:16px', 'font-family:Outfit,sans-serif'
+        ].join(';');
+        loadingOverlay.innerHTML = [
+            '<div style="width:40px;height:40px;border:3px solid #e0d5cc;border-top-color:#c0533a;',
+            'border-radius:50%;animation:zn-spin 0.8s linear infinite"></div>',
+            '<p style="color:#888;font-size:14px;margin:0">Preparing your session…</p>',
+            '<style>@keyframes zn-spin{to{transform:rotate(360deg)}}</style>'
+        ].join('');
+        document.body.appendChild(loadingOverlay);
+
         // Infer body sensations and generate Line A/B, then store in localStorage before redirect
         (async () => {
             const userEmotion = localStorage.getItem('userEmotion');

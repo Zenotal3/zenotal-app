@@ -338,13 +338,39 @@ document.addEventListener('DOMContentLoaded', () => {
     // Download functionality
     function setupDownloadButton() {
         const downloadButton = document.getElementById('journalDownloadButton') || document.getElementById('downloadButton');
-        if (downloadButton) {
-            downloadButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent card flip
-                downloadCard();
-            });
-            console.log('Download button setup complete');
+        if (!downloadButton) return;
+
+        downloadButton.addEventListener('click', (event) => {
+            event.stopPropagation(); // Prevent card flip
+            downloadCard();
+        });
+
+        // Bug 5 fix: the button starts as display:none — make it visible.
+        // Wait for html2canvas to load first (it's loaded via a <script> tag after this JS).
+        function showDownloadBtn() {
+            if (typeof window.html2canvas === 'function') {
+                downloadButton.style.display = 'flex';
+                console.log('Download button shown (html2canvas ready)');
+            } else {
+                // html2canvas not yet loaded — retry every 300ms for up to 5s
+                var attempts = 0;
+                var timer = setInterval(function () {
+                    attempts++;
+                    if (typeof window.html2canvas === 'function') {
+                        downloadButton.style.display = 'flex';
+                        clearInterval(timer);
+                        console.log('Download button shown after wait');
+                    } else if (attempts > 16) {
+                        // Give up after ~5s; still show the button but it will alert on click
+                        downloadButton.style.display = 'flex';
+                        clearInterval(timer);
+                        console.warn('html2canvas not loaded after 5s; download button shown anyway');
+                    }
+                }, 300);
+            }
         }
+        showDownloadBtn();
+        console.log('Download button setup complete');
     }
 
     async function downloadCard() {

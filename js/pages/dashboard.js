@@ -63,6 +63,9 @@
 
         dashboardLoading.style.display = 'none';
 
+        // setupAccount must run for ALL users (not just those with sessions)
+        setupAccount();
+
         if (allSessions.length === 0) {
             dashboardEmpty.style.display = 'block';
             return;
@@ -76,7 +79,6 @@
         renderKeywordCloud();
         renderSessionCards();
         setupToggle();
-        setupAccount();
         renderHero();
     }
 
@@ -506,15 +508,39 @@
 
         if (signOutBtn) {
             signOutBtn.addEventListener('click', function () {
-                if (typeof window.handleSignOut === 'function') {
-                    window.handleSignOut().then(function () {
-                        window.location.href = 'index.html';
-                    });
-                } else {
-                    // Fallback: clear local state and redirect
-                    localStorage.removeItem('userId');
-                    window.location.href = 'index.html';
+                signOutBtn.disabled = true;
+                signOutBtn.textContent = 'Signing out...';
+                function doSignOut() {
+                    if (typeof window.handleSignOut === 'function') {
+                        window.handleSignOut()
+                            .then(function () {
+                                localStorage.removeItem('userId');
+                                localStorage.removeItem('guestId');
+                                window.location.href = 'index.html';
+                            })
+                            .catch(function () {
+                                localStorage.removeItem('userId');
+                                window.location.href = 'index.html';
+                            });
+                    } else {
+                        // auth.js ES module not yet ready — wait briefly then retry once
+                        setTimeout(function () {
+                            if (typeof window.handleSignOut === 'function') {
+                                window.handleSignOut().then(function () {
+                                    localStorage.removeItem('userId');
+                                    localStorage.removeItem('guestId');
+                                    window.location.href = 'index.html';
+                                });
+                            } else {
+                                // Final fallback: clear storage and redirect
+                                localStorage.removeItem('userId');
+                                localStorage.removeItem('guestId');
+                                window.location.href = 'index.html';
+                            }
+                        }, 800);
+                    }
                 }
+                doSignOut();
             });
         }
     }

@@ -254,4 +254,17 @@ body {
 @media (max-width: 480px) {
     .last-grid    { grid-template-columns: 1fr; }
     .dash-content { padding: 20px 14px 48px; }
+    /* Bug 8 fix: prevent nav elements overlapping on small screens */
+    .dash-nav {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .dash-nav-logo span {
+        font-size: 0.9rem;
+    }
+    .btn-signout {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
 }

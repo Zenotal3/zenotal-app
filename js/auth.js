@@ -24,6 +24,20 @@ let currentUser = null;
   }));
 })();
 
+// Wait for window.migrateGuestSessions to be registered (db.js may load slightly after auth.js)
+function waitForMigrate(ms = 2000) {
+  return new Promise(resolve => {
+    if (typeof window.migrateGuestSessions === 'function') { resolve(); return; }
+    const start = Date.now();
+    const poll = setInterval(() => {
+      if (typeof window.migrateGuestSessions === 'function' || Date.now() - start > ms) {
+        clearInterval(poll);
+        resolve();
+      }
+    }, 50);
+  });
+}
+
 // Restore session (handles magic link callback via URL hash automatically)
 async function restoreSession() {
   try {
@@ -32,9 +46,14 @@ async function restoreSession() {
       currentUser = data.session.user;
       const prevGuestId = localStorage.getItem('guestId');
       localStorage.setItem('userId', currentUser.id);
-      // Migrate any guest sessions to the authenticated user
-      if (prevGuestId && prevGuestId !== currentUser.id && typeof window.migrateGuestSessions === 'function') {
-        await window.migrateGuestSessions(prevGuestId, currentUser.id);
+      // Bug 2 fix: wait for db.js to register migrateGuestSessions before calling it
+      if (prevGuestId && prevGuestId !== currentUser.id) {
+        await waitForMigrate();
+        if (typeof window.migrateGuestSessions === 'function') {
+          await window.migrateGuestSessions(prevGuestId, currentUser.id);
+        } else {
+          console.warn('migrateGuestSessions not available - guest data not migrated');
+        }
       }
     } else {
       currentUser = null;
@@ -55,9 +74,12 @@ supabase.auth.onAuthStateChange(async (_event, session) => {
     const prevGuestId = localStorage.getItem('guestId');
     currentUser = session.user;
     localStorage.setItem('userId', currentUser.id);
-    // Migrate guest sessions when user signs in
-    if (prevGuestId && prevGuestId !== currentUser.id && typeof window.migrateGuestSessions === 'function') {
-      await window.migrateGuestSessions(prevGuestId, currentUser.id);
+    // Bug 2 fix: wait for db.js to register migrateGuestSessions before calling it
+    if (prevGuestId && prevGuestId !== currentUser.id) {
+      await waitForMigrate();
+      if (typeof window.migrateGuestSessions === 'function') {
+        await window.migrateGuestSessions(prevGuestId, currentUser.id);
+      }
     }
   } else {
     currentUser = null;
@@ -202,12 +224,28 @@ async function handleSignUp(e) {
   setLoading(btn, false);
 
   if (error) {
-    showError('auth-signup-form', error.message || 'Sign up failed.');
+    // Bug 3 fix: provide user-friendly messages for common errors
+    const msg = error.message || '';
+    if (msg.toLowerCase().includes('already registered') || msg.toLowerCase().includes('user already exists')) {
+      showError('auth-signup-form', 'This email is already registered. Please sign in instead.');
+    } else if (msg.toLowerCase().includes('invalid email')) {
+      showError('auth-signup-form', 'Please enter a valid email address.');
+    } else if (msg.toLowerCase().includes('password') && msg.toLowerCase().includes('short')) {
+      showError('auth-signup-form', 'Password must be at least 6 characters.');
+    } else {
+      showError('auth-signup-form', msg || 'Sign up failed. Please try again.');
+    }
     return;
   }
 
-  // Show the verify step — but now we tell the user to click the link in their email
-  // (Supabase sends a magic link by default; the verify form shows a friendly message)
+  // Bug 3 fix: Supabase silently "succeeds" for existing emails but returns
+  // an empty identities array — detect this and show the correct error.
+  if (data?.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+    showError('auth-signup-form', 'This email is already registered. Please sign in instead.');
+    return;
+  }
+
+  // Show the verify step — user must click the confirmation link in their email
   switchModalMode('verify');
 }
 

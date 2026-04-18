@@ -371,18 +371,33 @@
         padding: 28px 20px 24px;
     }
 
+    /* Bug 8 fix: reduce auth-header size on mobile to avoid overlapping logo */
     .auth-header {
-        padding: 12px 16px;
-        gap: 8px;
+        padding: 8px 12px;
+        gap: 6px;
     }
 
     .auth-btn {
-        padding: 8px 16px;
-        font-size: 13px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    /* Hide text labels on very small screens; keep only avatar */
+    #auth-sign-in {
+        display: none !important;
+    }
+
+    #auth-sign-up {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+
+    .dashboard-link {
+        font-size: 12px;
+        padding: 6px 10px;
     }
 
     .auth-user-email {
-        max-width: 120px;
-        font-size: 13px;
+        display: none;
     }
 }
