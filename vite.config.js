@@ -43,7 +43,12 @@ export default defineConfig({
         app: './app.html',
         audio: './audio.html',
         sharing: './sharing.html',
-        dashboard: './dashboard.html'
+        dashboard: './dashboard.html',
+        // Chinese (zh) versions
+        mainZh: './index-zh.html',
+        conversationZh: './conversation-zh.html',
+        audioZh: './audio-zh.html',
+        sharingZh: './sharing-zh.html'
       }
     }
   },
