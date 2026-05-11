@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 speakBtn.disabled = true;
                 speakBtn.classList.add('active');
             } else {
-                alert("Please allow microphone access to use voice input.");
+                alert("请允许麦克风访问以使用语音输入。");
             }
         };
     }
@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         addMessageToChat('user', msg);
-        addMessageToChat('system', "Waiting for response...");
+        addMessageToChat('system', "等待响应...");
         disableInput();
 
         try {
@@ -470,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // TEST FUNCTION - Call this from console to test parsing
     window.testSummaryParsing = function(testResponse) {
         if (!testResponse) {
-            testResponse = `It sounds like you're really noticing how stress shows up in your body and mind. You mentioned feeling that tension in your shoulders, those racing thoughts about work, and that urge to just escape it all. What you really need right now is some space to breathe and reset.
+            testResponse = `听起来你真的注意到了压力在你身体和心理上的表现。 You mentioned feeling that tension in your shoulders, those racing thoughts about work, and that urge to just escape it all. What you really need right now is some space to breathe and reset.
 
 ---DATA---
 BODY_SENSATIONS: [shoulder tension, tight chest, shallow breathing]
@@ -530,7 +530,7 @@ Now let's move into a guided meditation practice.`;
         .catch(error => {
             removeSystemMessage();
             // Provide a fallback conversation starter
-            const fallbackMessage = `I understand you're feeling ${userEmotion}. Let's work through this together. Can you tell me what physical sensations you're noticing in your body right now?`;
+            const fallbackMessage = `我理解你现在感到${userEmotion}。让我们一起慢慢梳理。你能告诉我，你现在身体上有什么感觉吗？`;
             addMessageToChat('ai', fallbackMessage);
             // Enable input for user to continue conversation even without API
             enableInput();
@@ -549,7 +549,7 @@ Now let's move into a guided meditation practice.`;
             stopCurrentTTS();
         }
         if (!isSystem) addMessageToChat('user', message);
-        addMessageToChat('system', "Waiting for response...");
+        addMessageToChat('system', "等待响应...");
         disableInput();
         try {
             const data = await sendHotCrossBunMessage(message, hotCrossBunChatId);
@@ -792,12 +792,12 @@ Now let's move into a guided meditation practice.`;
         try {
             console.log('🚀 CALLING Line A API...');
             const lineAData = await generateLineA(userEmotion, sensation, bodySensations, userThoughts, userImpulses, userNeed, conversationMode);
-            const lineA = lineAData.response || 'Take a moment to notice your breath and body.';
+            const lineA = lineAData.response || '花一点时间，感受你的呼吸和身体。';
             console.log('✅ Line A generated:', lineA);
             
             console.log('🚀 CALLING Line B API...');
             const lineBData = await generateLineB(userEmotion, sensation, userThoughts, userImpulses, bodySensations, userNeed, conversationMode);
-            const lineB = lineBData.response || 'How are you feeling now?';
+            const lineB = lineBData.response || '你现在感觉怎么样？';
             console.log('✅ Line B generated:', lineB);
             
             // Store for audio page
@@ -832,7 +832,7 @@ Now let's move into a guided meditation practice.`;
                 console.log(`Found body sensations for ${normalizedEmotion}:`, bodySensations);
             } else {
                 console.log(`No mapping found for ${normalizedEmotion}, using default sensations`);
-                bodySensations = ['tension in the body', 'change in breathing'];
+                bodySensations = ['身体的紧绷感', '呼吸的变化'];
             }
 
             // Pick a random sensation from the array
@@ -843,17 +843,17 @@ Now let's move into a guided meditation practice.`;
             console.log('Body sensations inferred:', bodySensations);
         } catch (error) {
             console.error("Error loading emotion-body map:", error);
-            bodySensations = ['tension in the body', 'change in breathing'];
+            bodySensations = ['身体的紧绷感', '呼吸的变化'];
         }
     }
 
     async function processLineA() {
         currentState = 'line-a';
         
-        const sensation = bodySensations[0] || 'bodily sensation';
+        const sensation = bodySensations[0] || '身体感觉';
         
         chatWindow.innerHTML = '';
-        addMessageToChat('system', 'Generating mindfulness guidance...');
+        addMessageToChat('system', '正在生成正念引导...');
         
         try {
             console.log('Calling generateLineA with:', { userEmotion, sensation, bodySensations, userThoughts, userImpulses, userNeed });
@@ -874,7 +874,7 @@ Now let's move into a guided meditation practice.`;
             } else if (data.error) {
                 addMessageToChat('ai', `错误: ${data.error}`);
             } else {
-                addMessageToChat('ai', 'Received unexpected response from server.');
+                addMessageToChat('ai', '收到了意外的服务器响应。');
             }
             
             // Wait a moment before offering line B
@@ -884,7 +884,7 @@ Now let's move into a guided meditation practice.`;
         } catch (error) {
             console.error('Error in processLineA:', error);
             removeSystemMessage();
-            addMessageToChat('ai', 'Sorry, there was an error generating mindfulness guidance. Please make sure the backend server is running.');
+            addMessageToChat('ai', '抱歉，生成正念引导时出错。请确保后台服务正在运行。');
         }
     }
 
@@ -892,9 +892,9 @@ Now let's move into a guided meditation practice.`;
     async function processLineB() {
         currentState = 'line-b';
         
-        const sensation = bodySensations[0] || 'bodily sensation';
+        const sensation = bodySensations[0] || '身体感觉';
         
-        addMessageToChat('system', 'Generating follow-up...');
+        addMessageToChat('system', '正在生成跟进引导...');
         
         try {
             // Check if user had conversation or skipped
@@ -937,7 +937,7 @@ Now let's move into a guided meditation practice.`;
         } catch (error) {
             console.error('Error:', error);
             removeSystemMessage();
-            addMessageToChat('ai', 'Sorry, there was an error generating follow-up guidance.');
+            addMessageToChat('ai', '抱歉，生成跟进引导时出错。');
         }
     }
 
@@ -945,7 +945,7 @@ Now let's move into a guided meditation practice.`;
     function resetToNormalChat() {
         currentState = 'normal-chat';
         chatWindow.innerHTML = '';
-        addMessageToChat('ai', 'How can I assist you further today?');
+        addMessageToChat('ai', '今天还有什么我可以帮到你的吗？');
         userInput.disabled = false;
         if (speakBtn) {
             speakBtn.disabled = false;
@@ -986,19 +986,19 @@ Now let's move into a guided meditation practice.`;
         chatWindow.innerHTML = '';
         
         // Opening
-        addMessageToChat('ai', "Zenotal Reset begins—one calm breath at a time.");
-        speakResponse("Zenotal Reset begins—one calm breath at a time.");
+        addMessageToChat('ai', "定心复位开始——一次平静的呼吸，一次。");
+        speakResponse("定心复位开始——一次平静的呼吸，一次。");
         
         setTimeout(() => {
             // Intro
-            const introText = "Step one, recognising. Pause here. Sit upright, shoulders soft, feet grounded. Ask: What is present—sensations, emotions, thoughts?";
+            const introText = "第一步，觉察。在这里暂停。坐直，肩膀放松，双脚踏实。问问自己：此刻有什么——感觉、情绪、想法？";
             addMessageToChat('ai', introText);
             speakResponse(introText);
             
             // Next steps will happen after we get Line A
             setTimeout(() => {
                 // Get Line A (this will be different for each user)
-                const sensation = bodySensations[0] || 'bodily sensation';
+                const sensation = bodySensations[0] || '身体感觉';
                 generateLineA(userEmotion, sensation, bodySensations, userThoughts, userImpulses, userNeed)
                     .then(data => {
                         if (data.response) {
@@ -1008,20 +1008,20 @@ Now let's move into a guided meditation practice.`;
                             // Continue with fixed content after Line A
                             setTimeout(() => {
                                 // Recognising extension
-                                const recognisingText = "Allow that band to be exactly as it is, without pushing it away—simply knowing it's here.";
+                                const recognisingText = "让这种感受就这样存在，不要推开它——只是知道它在这里。";
                                 addMessageToChat('ai', recognisingText);
                                 speakResponse(recognisingText);
                                 
                                 setTimeout(() => {
                                     // Gathering
-                                    const gatheringText = "Step two, gathering attention at breath. We'll count five breaths together. One… two… three… four… five… letting each number steady the mind.";
+                                    const gatheringText = "第二步，将注意力聚焦在呼吸上。我们一起数五次呼吸。一……二……三……四……五……让每个数字稳定心神。";
                                     addMessageToChat('ai', gatheringText);
                                     speakResponse(gatheringText);
                                     
                                     // Silent period (10s)
                                     setTimeout(() => {
                                         // Expanding intro
-                                        const expandingText = "Step three, expanding awareness to the whole body—hips, shoulders, face, the breath moving through all of it.";
+                                        const expandingText = "第三步，将觉察扩展到整个身体——臀部、肩膀、面部，呼吸流经每一处。";
                                         addMessageToChat('ai', expandingText);
                                         speakResponse(expandingText);
                                         
@@ -1035,17 +1035,17 @@ Now let's move into a guided meditation practice.`;
                                                         
                                                         // Continue with expanding extension (3-min version only)
                                                         setTimeout(() => {
-                                                            const expandingExtensionText = "Allow breath to move through shoulders, back, face. Whatever sensations remain, breathe with them, not against them. Kindness is the posture of the heart.";
+                                                            const expandingExtensionText = "让呼吸流经肩膀、背部、面部。无论还有什么感受，与它们一同呼吸，而不是对抗它们。善意，是心的姿态。";
                                                             addMessageToChat('ai', expandingExtensionText);
                                                             speakResponse(expandingExtensionText);
                                                             
                                                             // Finish with outro
                                                             setTimeout(() => {
-                                                                const outroText1 = "Breathing continues, awareness steady.";
+                                                                const outroText1 = "呼吸继续，觉察稳定。";
                                                                 addMessageToChat('ai', outroText1);
                                                                 speakResponse(outroText1);
                                                                 setTimeout(() => {
-                                                                    const outroText2 = "May this ease ripple through the rest of your day.";
+                                                                    const outroText2 = "愿这份平静，延续到你今天剩余的时光。";
                                                                     addMessageToChat('ai', outroText2);
                                                                     speakResponse(outroText2);
                                                                     
@@ -1054,7 +1054,7 @@ Now let's move into a guided meditation practice.`;
                                                                     buttonDiv.className = 'choice-buttons';
                                                                     buttonDiv.innerHTML = `
                                                                         <button id="continueSession">继续练习</button>
-                                                                        <button id="endSession">End Session</button>
+                                                                        <button id="endSession">结束练习</button>
                                                                     `;
                                                                     chatWindow.appendChild(buttonDiv);
                                                                     
@@ -1063,7 +1063,7 @@ Now let's move into a guided meditation practice.`;
                                                                     });
                                                                     
                                                                     document.getElementById('endSession').addEventListener('click', () => {
-                                                                        const endText = "Thank you for taking time for mindfulness today. Remember you can return anytime.";
+                                                                        const endText = "感谢你今天花时间进行正念练习。记住，你随时可以回来。";
                                                                         chatWindow.innerHTML = `
                                                                             <div class="message ai">
                                                                                 <div class="bubble">
@@ -1095,16 +1095,16 @@ Now let's move into a guided meditation practice.`;
         chatWindow.innerHTML = '';
         
         // Opening
-        addMessageToChat('ai', "Zenotal Reset begins—one calm breath at a time.");
+        addMessageToChat('ai', "定心复位开始——一次平静的呼吸，一次。");
         
         setTimeout(() => {
             // Intro
-            addMessageToChat('ai', "Step one, recognising. Pause here. Sit upright, shoulders soft, feet grounded. Ask: What is present—sensations, emotions, thoughts?");
+            addMessageToChat('ai', "第一步，觉察。在这里暂停。坐直，肩膀放松，双脚踏实。问问自己：此刻有什么——感觉、情绪、想法？");
             
             // Next steps will happen after we get Line A
             setTimeout(() => {
                 // Get Line A (this will be different for each user)
-                const sensation = bodySensations[0] || 'bodily sensation';
+                const sensation = bodySensations[0] || '身体感觉';
                 generateLineA(userEmotion, sensation, bodySensations, userThoughts, userImpulses, userNeed)
                     .then(data => {
                         if (data.response) {
@@ -1114,16 +1114,16 @@ Now let's move into a guided meditation practice.`;
                             // Continue with fixed content after Line A
                             setTimeout(() => {
                                 // Recognising extension
-                                addMessageToChat('ai', "Allow that band to be exactly as it is, without pushing it away—simply knowing it's here.");
+                                addMessageToChat('ai', "让这种感受就这样存在，不要推开它——只是知道它在这里。");
                                 
                                 setTimeout(() => {
                                     // Gathering
-                                    addMessageToChat('ai', "Step two, gathering attention at breath. We'll count five breaths together. One… two… three… four… five… letting each number steady the mind.");
+                                    addMessageToChat('ai', "第二步，将注意力聚焦在呼吸上。我们一起数五次呼吸。一……二……三……四……五……让每个数字稳定心神。");
                                     
                                     // Silent period (10s)
                                     setTimeout(() => {
                                         // Expanding intro
-                                        addMessageToChat('ai', "Step three, expanding awareness to the whole body—hips, shoulders, face, the breath moving through all of it.");
+                                        addMessageToChat('ai', "第三步，将觉察扩展到整个身体——臀部、肩膀、面部，呼吸流经每一处。");
                                         
                                         // Get Line B (this will be different for each user)
                                         setTimeout(() => {
@@ -1135,16 +1135,16 @@ Now let's move into a guided meditation practice.`;
                                                         
                                                         // Finish with outro
                                                         setTimeout(() => {
-                                                            addMessageToChat('ai', "Breathing continues, awareness steady.");
+                                                            addMessageToChat('ai', "呼吸继续，觉察稳定。");
                                                             setTimeout(() => {
-                                                                addMessageToChat('ai', "May this ease ripple through the rest of your day.");
+                                                                addMessageToChat('ai', "愿这份平静，延续到你今天剩余的时光。");
                                                                 
                                                                 // Add buttons to continue or end session
                                                                 const buttonDiv = document.createElement('div');
                                                                 buttonDiv.className = 'choice-buttons';
                                                                 buttonDiv.innerHTML = `
                                                                     <button id="continueSession">继续练习</button>
-                                                                    <button id="endSession">End Session</button>
+                                                                    <button id="endSession">结束练习</button>
                                                                 `;
                                                                 chatWindow.appendChild(buttonDiv);
                                                                 

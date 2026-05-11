@@ -123,23 +123,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 2-MINUTE VERSION FILES
         '2min': {
             // Male versions
-            '01_2min_male.mp3': 12,
-            '02_male.mp3': 23,
-            '04_male.mp3': 11,
-            '06_male.mp3': 11,
-            '07_male.mp3': 21,
-            '09_2min_male.mp3': 6,
-            '10_2min_male.mp3': 23,
-            '12_2min_male.mp3': 12,
+            '01_2min_zh_male.mp3': 12,
+            '02_zh_male.mp3': 23,
+            '04_zh_male.mp3': 11,
+            '06_zh_male.mp3': 11,
+            '07_zh_male.mp3': 21,
+            '09_2min_zh_male.mp3': 6,
+            '10_2min_zh_male.mp3': 23,
+            '12_2min_zh_male.mp3': 12,
             // Female versions
-            '01_2min_female.mp3': 12,
-            '02_female.mp3': 23,
-            '04_female.mp3': 14,
-            '06_female.mp3': 9,
-            '07_female.mp3': 22,
-            '09_2min_female.mp3': 7,
-            '10_2min_female.mp3': 23,
-            '12_2min_female.mp3': 14,
+            '01_2min_zh_female.mp3': 12,
+            '02_zh_female.mp3': 23,
+            '04_zh_female.mp3': 14,
+            '06_zh_female.mp3': 9,
+            '07_zh_female.mp3': 22,
+            '09_2min_zh_female.mp3': 7,
+            '10_2min_zh_female.mp3': 23,
+            '12_2min_zh_female.mp3': 14,
             // No gender suffix files
             '3-seconds-of-silence.mp3': 3,
             '5-seconds-of-silence.mp3': 5,
@@ -149,27 +149,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         // 3-MINUTE VERSION FILES  
         '3min': {
             // Male versions
-            '01_3min_male.mp3': 16,
-            '02_male.mp3': 23,
-            '04_male.mp3': 11,
-            '06_male.mp3': 11,
-            '07_male.mp3': 21,
-            '09_3min_male.mp3': 9,
-            '10_2min_male.mp3': 23,
-            '10_3min+_male.mp3': 10,
-            '12_2min_male.mp3': 12,
-            '12+_3min_male.mp3': 12,
+            '01_3min_zh_male.mp3': 16,
+            '02_zh_male.mp3': 23,
+            '04_zh_male.mp3': 11,
+            '06_zh_male.mp3': 11,
+            '07_zh_male.mp3': 21,
+            '09_3min_zh_male.mp3': 9,
+            '10_2min_zh_male.mp3': 23,
+            '10_3min+_zh_male.mp3': 10,
+            '12_2min_zh_male.mp3': 12,
+            '12+_3min_zh_male.mp3': 12,
             // Female versions
-            '01_3min_female.mp3': 18,
-            '02_female.mp3': 23,
-            '04_female.mp3': 14,
-            '06_female.mp3': 9,
-            '07_female.mp3': 22,
-            '09_3min_female.mp3': 7,
-            '10_2min_female.mp3': 23,
-            '10_3min+_female.mp3': 10,
-            '12_2min_female.mp3': 14,
-            '12+_3min_female.mp3': 10,
+            '01_3min_zh_female.mp3': 18,
+            '02_zh_female.mp3': 23,
+            '04_zh_female.mp3': 14,
+            '06_zh_female.mp3': 9,
+            '07_zh_female.mp3': 22,
+            '09_3min_zh_female.mp3': 7,
+            '10_2min_zh_female.mp3': 23,
+            '10_3min+_zh_female.mp3': 10,
+            '12_2min_zh_female.mp3': 14,
+            '12+_3min_zh_female.mp3': 10,
             // No gender suffix files
             '3-seconds-of-silence.mp3': 3,
             '5-seconds-of-silence.mp3': 5,
@@ -179,12 +179,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Get character-specific audio file name
     function getCharacterAudioFile(baseFilename) {
-        // Handle different naming patterns:
-        // 1. Version + Gender: 01_2min -> 01_2min_female/male
-        // 2. Gender only: 02 -> 02_female/male  
+        // Handle different naming patterns for Chinese (zh) audio files:
+        // 1. Version + Gender: 01_2min -> 01_2min_zh_female/male
+        // 2. Gender only: 02 -> 02_zh_female/male  
         // 3. No suffix: 3-seconds-of-silence (stays the same)
         
-        const voiceSuffix = selectedVoice === 'female' ? '_female' : '_male';
+        const voiceSuffix = selectedVoice === 'female' ? '_zh_female' : '_zh_male';
         
         // Pattern 3: Files that don't need gender suffix (silence files)
         const noGenderFiles = ['3-seconds-of-silence.mp3', '5-seconds-of-silence.mp3', '10-seconds-of-silence.mp3'];
@@ -198,7 +198,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return `${baseName}${voiceSuffix}.mp3`;
         }
         
-        // Add voice suffix before the .mp3 extension
+        // Add zh voice suffix before the .mp3 extension
         return baseFilename.replace('.mp3', `${voiceSuffix}.mp3`);
     }
 
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- HYBRID AUDIO SESSION ---
     async function generateHybridAudioSession(sessionType) {
         try {
-            showLoadingState('Preparing your meditation...');
+            showLoadingState('正在准备您的冥想...');
             
             // 1. Get static audio URLs based on version
             const version = sessionType.duration; // 2 or 3
@@ -407,8 +407,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // 2. Get TTS for Line A and Line B (in parallel for better performance)
             const ttsPromises = [];
-            let fallbackLineA = "Notice your current experience with kindness and curiosity.";
-            let fallbackLineB = "How are you feeling now as you continue this practice?";
+            let fallbackLineA = "带着善意和好奇心，觉察你此刻的体验。";
+            let fallbackLineB = "在继续这个练习的过程中，你现在感觉怎么样？"
             
             console.log('Preparing TTS generation...');
             console.log('Line A for TTS:', lineA || 'Using fallback');
@@ -790,7 +790,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 // Show a brief error message but don't auto-skip
                 if (currentTimeDisplay) {
                     const originalText = currentTimeDisplay.textContent;
-                    currentTimeDisplay.textContent = 'Loading...';
+                    currentTimeDisplay.textContent = '加载中...';
                     setTimeout(() => {
                         currentTimeDisplay.textContent = originalText;
                     }, 2000);
@@ -1218,7 +1218,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     function showAudioError() {
         console.error('Audio not available. Starting text-based meditation...');
-        currentTimeDisplay.textContent = 'Error';
+        currentTimeDisplay.textContent = '错误';
         showTextBasedMeditation();
     }
 
@@ -1249,7 +1249,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.log('Message:', message);
         console.warn('Audio Issue:', message);
         if (currentTimeDisplay) {
-            currentTimeDisplay.textContent = 'Error';
+            currentTimeDisplay.textContent = '错误';
         }
     }
 

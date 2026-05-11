@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Start fade transition then navigate to app page
         startFadeTransition(() => {
-            window.location.href = 'app.html';
+            window.location.href = 'app-zh.html';
         });
     }
     
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         loadingOverlay.innerHTML = [
             '<div style="width:40px;height:40px;border:3px solid #e0d5cc;border-top-color:#c0533a;',
             'border-radius:50%;animation:zn-spin 0.8s linear infinite"></div>',
-            '<p style="color:#888;font-size:14px;margin:0">Preparing your session…</p>',
+            '<p style="color:#888;font-size:14px;margin:0">正在准备您的练习…</p>',
             '<style>@keyframes zn-spin{to{transform:rotate(360deg)}}</style>'
         ].join('');
         document.body.appendChild(loadingOverlay);
@@ -143,9 +143,9 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
                 const res = await fetch('js/emotion-body-map.json');
                 const map = await res.json();
-                bodySensations = map[userEmotion] || ['bodily sensation'];
+                bodySensations = map[userEmotion] || ['身体感觉'];
             } catch (e) {
-                bodySensations = ['bodily sensation'];
+                bodySensations = ['身体感觉'];
             }
 
             // Generate Line A
@@ -154,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const respA = await generateLineA(userEmotion, bodySensations[0]);
                 lineA = respA.response || '';
             } catch (e) {
-                lineA = 'Notice any tension or sensations you might be feeling right now in your body.';
+                lineA = '注意一下你现在身体里可能感受到的紧绷或感觉。';
             }
             localStorage.setItem('lineA', lineA);
 
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const respB = await generateLineB(userEmotion, bodySensations[0], [], []);
                 lineB = respB.response || '';
             } catch (e) {
-                lineB = 'How are you feeling in this moment? What thoughts or feelings are present?';
+                lineB = '此刻你感觉怎么样？有什么想法或感受在心里？';
             }
             localStorage.setItem('lineB', lineB);
 

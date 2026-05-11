@@ -386,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (typeof window.html2canvas !== 'function') {
                 console.error('html2canvas not loaded');
-                alert('Download feature is not available. Please try again.');
+                alert('下载功能暂不可用，请重试。');
                 return;
             }
 
@@ -444,7 +444,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Error downloading card:', error);
             
             // Fallback: show instructions to user
-            alert('Download failed. Please try right-clicking on the card and selecting "Save image as..." or take a screenshot.');
+            alert('下载失败。请尝试长按卡片并选择「保存图片」，或截图保存。');
         }
     }
 
