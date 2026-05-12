@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     window.openAuthModal('signup');
                 } else {
                     // Fallback: redirect to main page with signup intent
-                    window.location.href = 'index.html?signup=true';
+                    window.location.href = 'index-zh.html?signup=true';
                 }
             });
         }

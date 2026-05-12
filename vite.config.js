@@ -41,6 +41,7 @@ export default defineConfig({
         main: './index.html',
         conversation: './conversation.html',
         app: './app.html',
+        appZh: './app-zh.html',
         audio: './audio.html',
         sharing: './sharing.html',
         dashboard: './dashboard.html',
